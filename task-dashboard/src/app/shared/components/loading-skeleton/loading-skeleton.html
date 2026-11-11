@@ -1,0 +1,6 @@
+<div class="skeleton" role="status" [attr.aria-label]="label()">
+  @for (row of [].constructor(rows()); track $index) {
+    <div class="skeleton__row" [style.animation-delay]="$index * 80 + 'ms'"></div>
+  }
+  <span class="visually-hidden">{{ label() }}</span>
+</div>

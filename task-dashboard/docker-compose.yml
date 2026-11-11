@@ -1,0 +1,20 @@
+services:
+  api:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ../data-fetching:/data-fetching
+    command: sh -c "node mock-api/server.mjs"
+    ports:
+      - '3000:3000'
+    environment:
+      API_PORT: 3000
+      DATA_DIR: /data-fetching
+
+  web:
+    build: .
+    ports:
+      - '8080:80'
+    depends_on:
+      - api

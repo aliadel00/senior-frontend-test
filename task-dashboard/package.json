@@ -1,0 +1,63 @@
+{
+  "name": "task-dashboard",
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --port 4200",
+    "api": "node mock-api/server.mjs",
+    "data:generate": "node ../data-fetching/generate-data.js && node mock-api/build-db.mjs",
+    "dev": "concurrently -k -n api,web -c blue,green \"npm run api\" \"npm run start\"",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test --watch=false",
+    "test:coverage": "ng test --watch=false --coverage",
+    "lint": "ng lint",
+    "format": "prettier --write \"src/**/*.{ts,html,scss,json}\" \"mock-api/**/*.{mjs,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,scss,json}\"",
+    "ci": "npm run lint && npm run test:coverage && npm run build",
+    "prepare": "husky"
+  },
+  "private": true,
+  "packageManager": "npm@11.11.0",
+  "lint-staged": {
+    "src/**/*.{ts,html}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{scss,json}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@angular/animations": "^21.2.26",
+    "@angular/cdk": "^21.2.14",
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/material": "^21.2.14",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "chart.js": "^4.6.1",
+    "concurrently": "^10.0.7",
+    "json-server": "^1.0.0-beta.15",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.29",
+    "@angular/cli": "^21.2.29",
+    "@angular/compiler-cli": "^21.2.0",
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.12",
+    "angular-eslint": "21.4.0",
+    "eslint": "^10.3.0",
+    "husky": "^9.1.7",
+    "jsdom": "^28.0.0",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "8.59.2",
+    "vitest": "^4.0.8"
+  }
+}

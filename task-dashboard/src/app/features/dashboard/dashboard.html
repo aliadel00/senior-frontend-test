@@ -1,0 +1,71 @@
+<section class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <h1>Task Management Dashboard</h1>
+      <p>Track priorities, progress, and team workload in one place.</p>
+    </div>
+    <div class="dashboard__actions">
+      <button mat-stroked-button type="button" (click)="refresh()" [disabled]="busy()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <button mat-flat-button color="primary" type="button" (click)="openCreate()" [disabled]="busy()">
+        <mat-icon>add</mat-icon>
+        New Task
+      </button>
+    </div>
+  </header>
+
+  @if (error()) {
+    <mat-card class="dashboard__error" role="alert">
+      <p>Unable to load dashboard data. Check that the mock API is running on port 3000.</p>
+      <button mat-button type="button" (click)="refresh()">Retry</button>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="4" label="Loading dashboard" />
+  } @else {
+    <div class="dashboard__stats">
+      @for (stat of statistics(); track stat.id) {
+        <app-stat-card [statistic]="stat" />
+      }
+    </div>
+
+    <div class="dashboard__charts">
+      <mat-card class="panel">
+        <app-priority-chart [tasks]="tasks()" />
+      </mat-card>
+      <mat-card class="panel">
+        <app-status-chart [tasks]="tasks()" />
+      </mat-card>
+      <mat-card class="panel">
+        <app-activity-feed [items]="activity()" />
+      </mat-card>
+    </div>
+
+    <mat-card class="panel dashboard__tasks">
+      <div class="dashboard__tasks-header">
+        <h2>Tasks</h2>
+        <span>{{ filteredTasks().length }} shown</span>
+      </div>
+
+      <app-task-filters
+        [filters]="filters()"
+        [assignees]="assignees()"
+        (statusChange)="onStatusChange($event)"
+        (priorityChange)="onPriorityChange($event)"
+        (assigneeChange)="onAssigneeChange($event)"
+        (searchChange)="onSearchChange($event)"
+        (cleared)="resetFilters()"
+      />
+
+      <app-task-list
+        [tasks]="filteredTasks()"
+        (edit)="openEdit($event)"
+        (remove)="confirmDelete($event)"
+        (reorder)="onReorder($event)"
+      />
+    </mat-card>
+  }
+</section>

@@ -1,0 +1,43 @@
+.shell {
+  min-height: 100vh;
+}
+
+.shell__nav {
+  width: 240px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.shell__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.shell__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.shell__content {
+  padding: 1.25rem;
+  max-width: 1400px;
+}
+
+a.active {
+  background: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+}
+
+@media (max-width: 800px) {
+  .shell__nav {
+    width: 72px;
+  }
+
+  .shell__brand span,
+  .shell__nav span[matListItemTitle] {
+    display: none;
+  }
+}

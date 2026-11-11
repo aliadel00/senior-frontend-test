@@ -1,0 +1,25 @@
+.users {
+  display: grid;
+  gap: 1rem;
+}
+
+.users header h1 {
+  margin: 0 0 0.25rem;
+}
+
+.users header p {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.users__avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #1976d2;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+}

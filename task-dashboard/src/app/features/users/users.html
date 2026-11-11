@@ -1,0 +1,23 @@
+<section class="users">
+  <header>
+    <h1>Team</h1>
+    <p>Assignees available for task ownership.</p>
+  </header>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="4" label="Loading users" />
+  } @else {
+    <mat-card>
+      <mat-nav-list>
+        @for (user of assignees(); track user.id) {
+          <mat-list-item>
+            <span matListItemAvatar class="users__avatar" aria-hidden="true">{{ user.avatar }}</span>
+            <span matListItemTitle>{{ user.name }}</span>
+            <span matListItemLine>{{ user.email }} · {{ taskCount(user.id) }} tasks</span>
+            <mat-icon matListItemMeta aria-hidden="true">person</mat-icon>
+          </mat-list-item>
+        }
+      </mat-nav-list>
+    </mat-card>
+  }
+</section>
