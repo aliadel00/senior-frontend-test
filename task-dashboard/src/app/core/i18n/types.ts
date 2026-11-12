@@ -6,6 +6,7 @@ export interface Messages {
   searchPlaceholder: string;
   searchAria: string;
   clearSearch: string;
+  searchActiveHint: string;
   notifications: string;
   notificationsEmpty: string;
   notificationsEmptyUnread: string;

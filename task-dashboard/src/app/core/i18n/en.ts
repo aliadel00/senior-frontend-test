@@ -6,6 +6,7 @@ export const en: Messages = {
   searchPlaceholder: 'Search tasks...',
   searchAria: 'Search tasks',
   clearSearch: 'Clear search',
+  searchActiveHint: 'Clear search to show all tasks',
   notifications: 'Notifications',
   notificationsEmpty: "You're all caught up — no activity yet.",
   notificationsEmptyUnread: 'No unread notifications.',

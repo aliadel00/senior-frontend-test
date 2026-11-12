@@ -31,7 +31,15 @@
       </a>
     </div>
 
-    <div class="search search--topbar" [attr.title]="m().shortcutSearch + ' (/)'">
+    <div
+      class="search search--topbar"
+      [class.search--active]="search().search.trim()"
+      [attr.title]="
+        search().search.trim()
+          ? m().searchActiveHint
+          : m().shortcutSearch + ' (/)'
+      "
+    >
       <mat-icon aria-hidden="true">search</mat-icon>
       <input
         #searchInput
@@ -39,7 +47,11 @@
         [placeholder]="m().searchPlaceholder"
         [ngModel]="search().search"
         (ngModelChange)="onSearch($event)"
-        [attr.aria-label]="m().searchAria"
+        [attr.aria-label]="
+          search().search.trim()
+            ? m().searchAria + '. ' + m().searchActiveHint
+            : m().searchAria
+        "
         [attr.aria-keyshortcuts]="'/'"
       />
       @if (search().search.trim()) {
@@ -47,6 +59,7 @@
           class="search__clear"
           type="button"
           [attr.aria-label]="m().clearSearch"
+          [attr.title]="m().searchActiveHint"
           (click)="clearSearch()"
         >
           <mat-icon aria-hidden="true">close</mat-icon>
@@ -163,7 +176,11 @@
                       class="notifications__item"
                       [class.notifications__item--unread]="item.unread"
                       (click)="openNotification(item, $event)"
-                      [attr.aria-label]="m().notifyOpenTask + ': ' + item.taskTitle"
+                      [attr.aria-label]="
+                        item.action === 'deleted'
+                          ? item.summary + ': ' + item.taskTitle
+                          : m().notifyOpenTask + ': ' + item.taskTitle
+                      "
                     >
                       <span
                         class="notifications__icon"
@@ -199,8 +216,18 @@
     </div>
   </header>
 
-  <div class="mobile-search" [attr.title]="m().shortcutSearch + ' (/)'">
-    <div class="search search--mobile">
+  <div
+    class="mobile-search"
+    [attr.title]="
+      search().search.trim()
+        ? m().searchActiveHint
+        : m().shortcutSearch + ' (/)'
+    "
+  >
+    <div
+      class="search search--mobile"
+      [class.search--active]="search().search.trim()"
+    >
       <mat-icon aria-hidden="true">search</mat-icon>
       <input
         #mobileSearchInput
@@ -208,7 +235,11 @@
         [placeholder]="m().searchPlaceholder"
         [ngModel]="search().search"
         (ngModelChange)="onSearch($event)"
-        [attr.aria-label]="m().searchAria"
+        [attr.aria-label]="
+          search().search.trim()
+            ? m().searchAria + '. ' + m().searchActiveHint
+            : m().searchAria
+        "
         [attr.aria-keyshortcuts]="'/'"
       />
       @if (search().search.trim()) {
@@ -216,6 +247,7 @@
           class="search__clear"
           type="button"
           [attr.aria-label]="m().clearSearch"
+          [attr.title]="m().searchActiveHint"
           (click)="clearSearch()"
         >
           <mat-icon aria-hidden="true">close</mat-icon>
