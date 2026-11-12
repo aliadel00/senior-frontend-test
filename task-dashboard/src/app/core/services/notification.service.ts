@@ -65,7 +65,15 @@ export class NotificationService {
       .map((item) => this.toView(item, read, now, messages));
   });
 
-  readonly unreadCount = computed(() => this.items().filter((item) => item.unread).length);
+  /**
+   * Count across the full feed — not the panel's 12-item window.
+   * Otherwise a full unread inbox stays stuck (e.g. 12 seed rows) when new
+   * activity arrives in production.
+   */
+  readonly unreadCount = computed(() => {
+    const read = this.readIds();
+    return this.taskService.activityFeed().filter((item) => !read.has(item.id)).length;
+  });
 
   readonly visibleItems = computed(() => {
     const items = this.items();
@@ -96,7 +104,7 @@ export class NotificationService {
 
   markAllRead(): void {
     const next = new Set(this.readIds());
-    for (const item of this.items()) {
+    for (const item of this.taskService.activityFeed()) {
       next.add(item.id);
     }
     this.readIds.set(next);
