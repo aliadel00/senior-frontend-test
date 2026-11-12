@@ -27,7 +27,11 @@ npm run dev
 | `npm test` | Unit tests (Vitest via Angular) |
 | `npm run lint` | ESLint |
 | `npm run build` | Production build |
-| `npm run ci` | Lint + coverage tests + build |
+| `npm run test:i18n` | en/ar message catalog parity |
+| `npm run test:content-a11y` | Static content accessibility audit |
+| `npm run test:a11y` | Playwright + axe WCAG 2.1 AA (critical/serious) |
+| `npm run test:lighthouse` | Lighthouse CI (score > 90) |
+| `npm run ci` | Lint + tests + i18n + a11y + build + Lighthouse |
 
 ## Architecture
 
@@ -74,17 +78,19 @@ Custom Node mock API (`mock-api/server.mjs`) shaped like the assignment response
 - GET response caching interceptor
 - Chart instances destroyed on teardown
 
-## Tooling
+## Tooling / CI gates
 
 - ESLint (`angular-eslint`) + Prettier
 - Husky + lint-staged on pre-commit
-- GitHub Actions CI (repo root `.github/workflows/ci.yml`)
+- GitHub Actions CI (repo root `.github/workflows/ci.yml`):
+  - lint, unit tests, **i18n parity**, content-a11y, production build
+  - Playwright + **axe WCAG 2.1 AA** (critical + serious)
+  - **Lighthouse** median score **> 90** (performance + accessibility)
 - Docker + docker-compose (web on `:8080`, API on `:3000`)
 
 ```bash
 docker compose up --build
 ```
-
 
 ### Internationalization
 
