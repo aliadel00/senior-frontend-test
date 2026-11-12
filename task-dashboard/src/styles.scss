@@ -118,6 +118,165 @@ html.tm-theme-fading .mobile-search {
   }
 }
 
+/* Theme toggle chrome — kept global so shell.scss stays under anyComponentStyle budget. */
+.icon-btn--theme {
+  overflow: visible;
+
+  &:hover .theme-icon {
+    transform: scale(1.06);
+  }
+
+  &:active .theme-icon {
+    transform: scale(0.92);
+  }
+}
+
+.icon-btn--theme-pulse .theme-icon {
+  animation: tm-theme-pulse 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.theme-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s ease;
+
+  mat-icon {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    transition:
+      opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.theme-icon__moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-icon__sun {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.35);
+}
+
+.icon-btn--theme-dark {
+  .theme-icon__moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.35);
+  }
+
+  .theme-icon__sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes tm-theme-pulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.18) rotate(12deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Shell focus rings kept global to avoid anyComponentStyle budget pressure. */
+.nav-link:focus,
+.shell__content:focus {
+  outline: none;
+}
+
+.nav-link:focus-visible,
+.shell__content:focus-visible {
+  outline: 2px solid var(--tm-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 960px) {
+  .theme-btn--topbar {
+    display: none;
+  }
+
+  .sidebar__theme {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    width: 100%;
+  }
+
+  .theme-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+    width: 100%;
+    padding: 0.25rem;
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-sm);
+    background: var(--tm-bg);
+  }
+
+  .theme-switch__option {
+    appearance: none;
+    border: 0;
+    border-radius: calc(var(--tm-radius-sm) - 2px);
+    min-height: 2.35rem;
+    padding: 0.45rem 0.65rem;
+    background: transparent;
+    color: var(--tm-text-muted);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: inherit;
+    }
+
+    &:hover {
+      color: var(--tm-text);
+      background: color-mix(in srgb, var(--tm-surface) 70%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--tm-primary);
+      outline-offset: 1px;
+    }
+
+    &--active {
+      background: var(--tm-surface);
+      color: var(--tm-primary);
+      box-shadow: var(--tm-shadow);
+
+      &:hover {
+        background: var(--tm-surface);
+        color: var(--tm-primary);
+      }
+    }
+  }
+}
+
 html[data-theme='light'] body {
   color-scheme: light;
 }
@@ -133,6 +292,13 @@ html[data-theme='dark'] body {
 
   body {
     transition: none;
+  }
+
+  .theme-icon mat-icon,
+  .theme-icon,
+  .icon-btn--theme-pulse .theme-icon {
+    transition: none;
+    animation: none;
   }
 }
 
