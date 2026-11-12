@@ -40,8 +40,12 @@ __screenshots__/
 testem.log
 libpeerconnection.log
 
-# Generated local API DB can stay tracked for demos; ignore backups
+# Local mock API DB mutates while the app runs; keep seed out of git status
+task-dashboard/mock-api/db.json
 *.bak
+
+# Local linear-history helper (optional; not part of the assessment app)
+scripts/check-linear-history.sh
 
 # Local split tooling
 .split-final-snapshot/
