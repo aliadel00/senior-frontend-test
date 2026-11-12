@@ -42,3 +42,11 @@ libpeerconnection.log
 
 # Generated local API DB can stay tracked for demos; ignore backups
 *.bak
+
+# Local split tooling
+.split-final-snapshot/
+
+# Test / perf artifacts
+**/test-results/
+**/playwright-report/
+**/.lighthouseci/

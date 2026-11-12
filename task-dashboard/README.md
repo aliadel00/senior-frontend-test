@@ -74,11 +74,14 @@ Custom Node mock API (`mock-api/server.mjs`) shaped like the assignment response
 - GET response caching interceptor
 - Chart instances destroyed on teardown
 
-## Tooling
+## Tooling / CI gates
 
 - ESLint (`angular-eslint`) + Prettier
 - Husky + lint-staged on pre-commit
-- GitHub Actions CI (repo root `.github/workflows/ci.yml`)
+- GitHub Actions CI (repo root `.github/workflows/ci.yml`):
+  - lint, unit tests, **i18n parity**, content-a11y, production build
+  - Playwright + **axe WCAG 2.1 AA** (critical + serious)
+  - **Lighthouse** median score **> 90** (performance + accessibility)
 - Docker + docker-compose (web on `:8080`, API on `:3000`)
 
 ```bash
