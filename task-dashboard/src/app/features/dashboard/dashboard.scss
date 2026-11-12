@@ -16,6 +16,10 @@
 
 .dashboard__board {
   scroll-margin-top: calc(var(--tm-topbar-height) + 0.75rem);
+
+  &:focus {
+    outline: none;
+  }
 }
 
 @media (max-width: 960px) {

@@ -861,6 +861,15 @@
     color: var(--tm-text);
   }
 
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tm-primary);
+    outline-offset: 2px;
+  }
+
   &--active {
     background: var(--tm-primary-soft);
     color: var(--tm-primary);
@@ -949,6 +958,16 @@
 .shell__content {
   padding: 1.25rem 1.5rem 2rem;
   min-width: 0;
+
+  /* tabindex=-1 skip target — kill the default focus box on route/hash moves. */
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tm-primary);
+    outline-offset: 2px;
+  }
 }
 
 @media (max-width: 960px) {

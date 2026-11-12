@@ -65,13 +65,13 @@ export class ThemeService {
     this.setTheme(this.themeState() === 'dark' ? 'light' : 'dark');
   }
 
-  async toggleAnimated(_event?: MouseEvent): Promise<void> {
+  async toggleAnimated(): Promise<void> {
     const next: Theme = this.themeState() === 'dark' ? 'light' : 'dark';
     await this.setThemeAnimated(next);
   }
 
   /** Soft whole-app fade on every viewport. */
-  async setThemeAnimated(next: Theme, _event?: MouseEvent): Promise<void> {
+  async setThemeAnimated(next: Theme): Promise<void> {
     if (this.transitioning || this.themeState() === next) {
       return;
     }
