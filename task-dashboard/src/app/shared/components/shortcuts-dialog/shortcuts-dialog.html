@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>{{ m().shortcutsTitle }}</h2>
+<mat-dialog-content>
+  <p class="shortcuts-dialog__intro">{{ m().shortcutsIntro }}</p>
+  <ul class="shortcuts-dialog__list">
+    @for (row of rows; track row.labelKey) {
+      <li class="shortcuts-dialog__row">
+        <span class="shortcuts-dialog__label">{{ m()[row.labelKey] }}</span>
+        <span class="shortcuts-dialog__keys">
+          @for (key of row.keys; track key) {
+            <kbd>{{ key }}</kbd>
+          }
+        </span>
+      </li>
+    }
+  </ul>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-flat-button type="button" color="primary" (click)="close()">
+    {{ m().gotIt }}
+  </button>
+</mat-dialog-actions>

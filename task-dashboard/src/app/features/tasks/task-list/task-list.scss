@@ -2,61 +2,86 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
+  align-items: start;
 }
 
 .board__column {
-  background: #f7f9fc;
-  border-radius: 1rem;
-  padding: 0.75rem;
-  min-height: 320px;
+  background: transparent;
+  min-width: 0;
 }
 
 .board__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-}
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
 
-.board__header h2 {
-  margin: 0;
-  font-size: 1rem;
+  h2 {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tm-text-muted);
+  }
 }
 
 .board__count {
-  background: #e3f2fd;
-  color: #1565c0;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 0.4rem;
   border-radius: 999px;
-  padding: 0.1rem 0.55rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: #e5e7eb;
+  color: var(--tm-text-muted);
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .board__list {
   display: grid;
   gap: 0.75rem;
   min-height: 120px;
+  padding: 0.15rem;
+  border-radius: var(--tm-radius);
 }
 
-.board__item.cdk-drag-preview {
-  box-sizing: border-box;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 24px rgb(0 0 0 / 16%);
-}
+.board__item {
+  cursor: grab;
 
-.board__item.cdk-drag-placeholder {
-  opacity: 0.35;
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .board__empty {
-  margin: 1rem 0;
+  margin: 0;
+  padding: 1rem;
   text-align: center;
-  color: var(--mat-sys-on-surface-variant);
-  font-size: 0.875rem;
+  color: var(--tm-text-soft);
+  font-size: 0.85rem;
+  border: 1px dashed var(--tm-border);
+  border-radius: var(--tm-radius);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.cdk-drop-list-dragging .board__item:not(.cdk-drag-placeholder) {
+  transition: transform 200ms ease;
 }
 
 @media (max-width: 960px) {
   .board {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .board {
+    gap: 1.25rem;
+  }
+
+  .board__list {
+    gap: 0.65rem;
   }
 }

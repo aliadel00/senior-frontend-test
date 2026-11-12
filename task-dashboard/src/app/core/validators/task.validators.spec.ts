@@ -14,6 +14,10 @@ describe('task validators', () => {
   it('validates due dates', () => {
     expect(dueDateValidator()(new FormControl('2026-13-40'))).toEqual({ invalidDate: true });
     expect(dueDateValidator()(new FormControl('2026-11-11'))).toBeNull();
+    expect(dueDateValidator()(new FormControl(new Date(2026, 10, 11)))).toBeNull();
+    expect(dueDateValidator()(new FormControl(new Date('invalid')))).toEqual({
+      invalidDate: true,
+    });
   });
 
   it('validates tags', () => {

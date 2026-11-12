@@ -54,15 +54,16 @@ function readBody(req) {
 }
 
 function pushActivity(db, task, action) {
+  // Unique id per call — same task can have many entries (one per action).
   db.activity.unshift({
-    id: `activity-${Date.now()}`,
+    id: `activity-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     taskId: task.id,
     taskTitle: task.title,
     action,
     actor: task.assignee?.name ?? 'System',
     timestamp: new Date().toISOString(),
   });
-  db.activity = db.activity.slice(0, 30);
+  db.activity = db.activity.slice(0, 40);
 }
 
 const server = http.createServer(async (req, res) => {
@@ -141,11 +142,15 @@ const server = http.createServer(async (req, res) => {
 
       if (req.method === 'PATCH' || req.method === 'PUT') {
         const body = await readBody(req);
-        db.tasks[index] = { ...db.tasks[index], ...body, id };
+        const prev = db.tasks[index];
+        db.tasks[index] = { ...prev, ...body, id };
         db.meta.tasksLastUpdated = new Date().toISOString();
-        pushActivity(db, db.tasks[index], 'updated');
+        const next = db.tasks[index];
+        const action =
+          next.status === 'done' && prev.status !== 'done' ? 'completed' : 'updated';
+        pushActivity(db, next, action);
         writeDb(db);
-        send(res, 200, db.tasks[index]);
+        send(res, 200, next);
         return;
       }
 

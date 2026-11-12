@@ -1,6 +1,114 @@
-<div class="skeleton" role="status" [attr.aria-label]="label()">
-  @for (row of [].constructor(rows()); track $index) {
-    <div class="skeleton__row" [style.animation-delay]="$index * 80 + 'ms'"></div>
+<div class="skeleton" role="status" [attr.aria-label]="resolvedLabel()" [attr.data-variant]="variant()">
+  @switch (variant()) {
+    @case ('dashboard') {
+      <div class="sk-stats" aria-hidden="true">
+        @for (slot of statSlots; track slot) {
+          <article class="sk-stat">
+            <div class="sk-stat__top">
+              <span class="bone bone--sm bone--w40"></span>
+              <span class="bone bone--icon"></span>
+            </div>
+            <span class="bone bone--lg bone--w50"></span>
+            <span class="bone bone--xs bone--w35"></span>
+          </article>
+        }
+      </div>
+
+      <div class="sk-toolbar" aria-hidden="true">
+        <div class="sk-tabs">
+          <span class="bone bone--tab"></span>
+          <span class="bone bone--tab"></span>
+          <span class="bone bone--tab"></span>
+          <span class="bone bone--tab"></span>
+        </div>
+        <div class="sk-actions">
+          <span class="bone bone--select"></span>
+          <span class="bone bone--select"></span>
+          <span class="bone bone--btn"></span>
+        </div>
+      </div>
+
+      <div class="sk-board" aria-hidden="true">
+        @for (count of boardColumns; track $index) {
+          <section class="sk-column">
+            <header class="sk-column__header">
+              <span class="bone bone--xs bone--w40"></span>
+              <span class="bone bone--chip"></span>
+            </header>
+            <div class="sk-column__list">
+              @for (_ of [].constructor(count); track $index) {
+                <article class="sk-task">
+                  <div class="sk-task__top">
+                    <span class="bone bone--pill"></span>
+                    <span class="bone bone--dots"></span>
+                  </div>
+                  <span class="bone bone--md bone--w80"></span>
+                  <span class="bone bone--sm bone--w95"></span>
+                  <span class="bone bone--sm bone--w70"></span>
+                  <span class="bone bone--xs bone--w45"></span>
+                  <span class="bone bone--xs bone--w30"></span>
+                  <footer class="sk-task__footer">
+                    <span class="bone bone--avatar"></span>
+                    <span class="bone bone--xs bone--w35"></span>
+                  </footer>
+                </article>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+
+    @case ('analytics') {
+      <div class="sk-analytics" aria-hidden="true">
+        <article class="sk-panel">
+          <span class="bone bone--md bone--w45"></span>
+          <div class="sk-chart">
+            <span class="bone bone--bar" style="--h: 48%"></span>
+            <span class="bone bone--bar" style="--h: 72%"></span>
+            <span class="bone bone--bar" style="--h: 36%"></span>
+          </div>
+        </article>
+        <article class="sk-panel">
+          <span class="bone bone--md bone--w50"></span>
+          <div class="sk-donut-wrap">
+            <span class="bone bone--donut"></span>
+          </div>
+        </article>
+        <article class="sk-panel sk-panel--activity">
+          <span class="bone bone--md bone--w40"></span>
+          <div class="sk-feed">
+            @for (_ of activityRows; track $index) {
+              <div class="sk-feed__item">
+                <span class="bone bone--sm bone--w75"></span>
+                <span class="bone bone--xs bone--w55"></span>
+              </div>
+            }
+          </div>
+        </article>
+      </div>
+    }
+
+    @case ('users') {
+      <div class="sk-users" aria-hidden="true">
+        @for (_ of userRows; track $index) {
+          <div class="sk-user">
+            <span class="bone bone--avatar-lg"></span>
+            <div class="sk-user__meta">
+              <span class="bone bone--sm bone--w40"></span>
+              <span class="bone bone--xs bone--w60"></span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @default {
+      @for (row of [].constructor(rows()); track $index) {
+        <div class="skeleton__row" [style.animation-delay]="$index * 80 + 'ms'"></div>
+      }
+    }
   }
+
   <span class="visually-hidden">{{ label() }}</span>
 </div>

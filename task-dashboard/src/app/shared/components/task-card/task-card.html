@@ -1,54 +1,49 @@
-<mat-card class="task-card" [class.task-card--overdue]="task().isOverdue">
+<article
+  class="task-card"
+  [class.task-card--overdue]="task().isOverdue && task().status !== 'done'"
+>
   <div class="task-card__top">
-    <div>
-      <h3 class="task-card__title">{{ task().title }}</h3>
-      <p class="task-card__desc">{{ task().description }}</p>
-    </div>
+    <span class="priority" [attr.data-priority]="task().priority">
+      {{ priorityLabel() }}
+    </span>
     <button
-      mat-icon-button
       type="button"
+      class="task-card__menu"
       [matMenuTriggerFor]="menu"
-      [attr.aria-label]="'Actions for ' + task().title"
+      [attr.aria-label]="actionsAria()"
     >
-      <mat-icon>more_vert</mat-icon>
+      <mat-icon aria-hidden="true">more_vert</mat-icon>
     </button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item type="button" (click)="edit.emit(task())">
-        <mat-icon>edit</mat-icon>
-        <span>Edit</span>
+        <mat-icon aria-hidden="true">edit</mat-icon>
+        <span>{{ m().edit }}</span>
       </button>
       <button mat-menu-item type="button" (click)="remove.emit(task())">
-        <mat-icon>delete</mat-icon>
-        <span>Delete</span>
+        <mat-icon aria-hidden="true">delete</mat-icon>
+        <span>{{ m().delete }}</span>
       </button>
     </mat-menu>
   </div>
 
-  <div class="task-card__meta">
-    <span class="badge badge--status" [attr.data-status]="task().status">
-      {{ statusLabels[task().status] }}
-    </span>
-    <span class="badge badge--priority" [attr.data-priority]="task().priority">
-      {{ priorityLabels[task().priority] }}
-    </span>
-    @if (task().isOverdue) {
-      <span class="badge badge--overdue">Overdue</span>
+  <h3 class="task-card__title">{{ task().title }}</h3>
+  <p class="task-card__desc">{{ task().description }}</p>
+
+  <p class="task-card__due" [attr.data-tone]="dueLabel().tone">
+    @if (dueLabel().tone === 'danger') {
+      <mat-icon aria-hidden="true">warning</mat-icon>
+    } @else if (dueLabel().tone === 'success') {
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
+    } @else {
+      <mat-icon aria-hidden="true">calendar_today</mat-icon>
     }
-  </div>
+    <span>{{ dueLabel().text }}</span>
+  </p>
 
-  <div class="task-card__footer">
-    <div class="assignee">
-      <span class="assignee__avatar" aria-hidden="true">{{ task().assignee.avatar }}</span>
-      <span>{{ task().assignee.name }}</span>
-    </div>
-    <time [attr.datetime]="task().dueDate">Due {{ task().dueDate | date: 'mediumDate' }}</time>
-  </div>
+  <p class="task-card__category">{{ category() }}</p>
 
-  @if (task().tags.length) {
-    <mat-chip-set class="task-card__tags" aria-label="Task tags">
-      @for (tag of task().tags; track tag) {
-        <mat-chip>{{ tag | titlecase }}</mat-chip>
-      }
-    </mat-chip-set>
-  }
-</mat-card>
+  <footer class="task-card__footer">
+    <span class="assignee__avatar" aria-hidden="true">{{ initials() }}</span>
+    <span class="assignee__name">{{ handle() }}</span>
+  </footer>
+</article>

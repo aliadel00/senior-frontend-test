@@ -1,11 +1,15 @@
-<mat-card class="stat-card" [style.--accent]="statistic().color">
-  <div class="stat-card__header">
-    <span class="stat-card__title">{{ statistic().title }}</span>
-    <mat-icon class="stat-card__icon" aria-hidden="true">{{ statistic().icon }}</mat-icon>
+<article class="stat-card" [attr.data-tone]="tone()">
+  <div class="stat-card__top">
+    <p class="stat-card__title">{{ statistic().title }}</p>
+    <span class="stat-card__icon" aria-hidden="true">
+      <mat-icon aria-hidden="true">{{ statistic().icon }}</mat-icon>
+    </span>
   </div>
   <p class="stat-card__value">{{ statistic().value }}</p>
   <p class="stat-card__change" [class]="'stat-card__change--' + statistic().changeType">
-    <span>{{ statistic().change }}</span>
-    <span>{{ statistic().changeLabel }}</span>
+    @if (statistic().change && statistic().change !== '0') {
+      {{ statistic().change }}
+    }
+    {{ statistic().changeLabel }}
   </p>
-</mat-card>
+</article>

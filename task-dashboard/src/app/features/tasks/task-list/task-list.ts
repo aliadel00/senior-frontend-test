@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -6,7 +6,8 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { MatCardModule } from '@angular/material/card';
-import { STATUS_LABELS, Task, TaskStatus } from '../../../core/models/task.model';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { Task, TaskStatus } from '../../../core/models/task.model';
 import { TaskCard } from '../../../shared/components/task-card/task-card';
 
 @Component({
@@ -17,13 +18,23 @@ import { TaskCard } from '../../../shared/components/task-card/task-card';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskList {
+  private readonly i18n = inject(I18nService);
+
   readonly tasks = input.required<Task[]>();
   readonly edit = output<Task>();
   readonly remove = output<Task>();
   readonly reorder = output<{ tasks: Task[]; moved?: { task: Task; status: TaskStatus } }>();
 
   readonly columns: TaskStatus[] = ['todo', 'in_progress', 'done'];
-  readonly statusLabels = STATUS_LABELS;
+  readonly m = computed(() => this.i18n.messages());
+
+  statusLabel(status: TaskStatus): string {
+    return this.i18n.statusLabel(status);
+  }
+
+  columnAria(status: TaskStatus): string {
+    return this.i18n.fill(this.m().columnAria, { status: this.statusLabel(status) });
+  }
 
   tasksByStatus(status: TaskStatus): Task[] {
     return this.tasks().filter((task) => task.status === status);
@@ -34,6 +45,11 @@ export class TaskList {
   }
 
   onDrop(event: CdkDragDrop<Task[]>, status: TaskStatus): void {
+    // Prevent the browser from scrolling the focused drag handle back into view.
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
     if (event.previousContainer === event.container) {
       const copy = [...event.container.data];
       moveItemInArray(copy, event.previousIndex, event.currentIndex);
