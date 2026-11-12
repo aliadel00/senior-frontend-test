@@ -27,11 +27,7 @@ npm run dev
 | `npm test` | Unit tests (Vitest via Angular) |
 | `npm run lint` | ESLint |
 | `npm run build` | Production build |
-| `npm run test:i18n` | en/ar message catalog parity |
-| `npm run test:content-a11y` | Static content accessibility audit |
-| `npm run test:a11y` | Playwright + axe WCAG 2.1 AA (critical/serious) |
-| `npm run test:lighthouse` | Lighthouse CI (score > 90) |
-| `npm run ci` | Lint + tests + i18n + a11y + build + Lighthouse |
+| `npm run ci` | Lint + coverage tests + build |
 
 ## Architecture
 
@@ -91,6 +87,7 @@ Custom Node mock API (`mock-api/server.mjs`) shaped like the assignment response
 ```bash
 docker compose up --build
 ```
+
 
 ### Internationalization
 

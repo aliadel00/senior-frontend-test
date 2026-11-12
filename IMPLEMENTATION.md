@@ -110,7 +110,7 @@ Local CI (`npm run ci`) runs lint → coverage tests → i18n parity → content
 ## Tooling & delivery extras
 
 - **Husky + lint-staged** — ESLint/Prettier on commit
-- **GitHub Actions** — `.github/workflows/ci.yml` (Node 22): unit tests, i18n, a11y (axe), Lighthouse >90
+- **GitHub Actions** — `.github/workflows/ci.yml` (Node 22): unit tests, i18n, a11y (axe), Lighthouse >90, Docker Compose smoke
 - **Docker** — `Dockerfile` + `docker-compose.yml` (nginx web + API)
 - **i18n** — EN/AR catalogs + language toggle (`I18nService`)
 - **Accessibility** — skip link, semantic landmarks, Playwright axe gate (critical + serious)
