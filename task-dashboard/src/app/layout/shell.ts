@@ -29,6 +29,8 @@ interface NavLink {
   key: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'team' | 'settings';
   icon: string;
   path?: string;
+  /** In-page section on the same route (e.g. task board). Exclusive with route-only links. */
+  fragment?: string;
   disabled?: boolean;
   shortcut?: string;
 }
@@ -55,6 +57,8 @@ export class Shell {
   readonly search = this.store.filters;
   readonly menuOpen = signal(false);
   readonly notificationsOpen = signal(false);
+  /** Drives nav active state under OnPush (path + fragment). */
+  private readonly navUrl = signal(this.router.url);
   /** Whole-app EN↔AR transition: idle → out → in → idle. */
   readonly localePhase = signal<'idle' | 'out' | 'in'>('idle');
   readonly m = computed(() => this.i18n.messages());
@@ -65,7 +69,12 @@ export class Shell {
 
   readonly links: NavLink[] = [
     { path: '/dashboard', key: 'dashboard', icon: 'dashboard', shortcut: '1' },
-    { path: '/dashboard', key: 'tasks', icon: 'task_alt' },
+    {
+      path: '/dashboard',
+      key: 'tasks',
+      icon: 'task_alt',
+      fragment: 'task-board',
+    },
     { key: 'calendar', icon: 'calendar_today', disabled: true },
     { path: '/analytics', key: 'analytics', icon: 'analytics', shortcut: '2' },
     { path: '/users', key: 'team', icon: 'group', shortcut: '3' },
@@ -78,7 +87,8 @@ export class Shell {
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
-      .subscribe(() => {
+      .subscribe((event) => {
+        this.navUrl.set(event.urlAfterRedirects);
         this.menuOpen.set(false);
         this.notificationsOpen.set(false);
       });
@@ -195,7 +205,7 @@ export class Shell {
       return;
     }
 
-    const onDashboard = this.router.url.split('?')[0] === '/dashboard';
+    const onDashboard = this.currentPath() === '/dashboard';
     if (!this.scrolledForSearch || !onDashboard) {
       this.scrolledForSearch = true;
       void this.revealTasks();
@@ -208,10 +218,24 @@ export class Shell {
     this.scrolledForSearch = false;
   }
 
+  private currentPath(): string {
+    const tree = this.router.parseUrl(this.navUrl());
+    const primary = tree.root.children['primary'];
+    if (!primary?.segments.length) {
+      return '/';
+    }
+    return `/${primary.segments.map((s) => s.path).join('/')}`;
+  }
+
+  private currentFragment(): string | null {
+    return this.router.parseUrl(this.navUrl()).fragment;
+  }
+
   private async revealTasks(): Promise<void> {
-    const onDashboard = this.router.url.split('?')[0] === '/dashboard';
-    if (!onDashboard) {
-      await this.router.navigateByUrl('/dashboard');
+    const onDashboard = this.currentPath() === '/dashboard';
+    const onBoard = this.currentFragment() === 'task-board';
+    if (!onDashboard || !onBoard) {
+      await this.router.navigate(['/dashboard'], { fragment: 'task-board' });
     }
 
     window.setTimeout(
@@ -221,14 +245,14 @@ export class Shell {
           block: 'start',
         });
       },
-      onDashboard ? 0 : 80,
+      onDashboard && onBoard ? 0 : 80,
     );
   }
 
   onNewTask(): void {
     this.menuOpen.set(false);
     this.notificationsOpen.set(false);
-    void this.router.navigateByUrl('/dashboard');
+    void this.router.navigate(['/dashboard'], { fragment: 'task-board' });
     this.taskUi.requestCreate();
   }
 
@@ -262,6 +286,28 @@ export class Shell {
     this.menuOpen.set(false);
     this.notificationsOpen.set(false);
     void this.router.navigateByUrl(path);
+  }
+
+  onNavClick(link: NavLink, event: Event): void {
+    if (!link.path || link.disabled) {
+      return;
+    }
+    // Keep routerLink for open-in-new-tab; handle exclusive section scroll ourselves.
+    if (link.fragment) {
+      event.preventDefault();
+      this.closeMenu();
+      void this.revealTasks();
+      return;
+    }
+    if (link.key === 'dashboard') {
+      event.preventDefault();
+      this.closeMenu();
+      void this.router.navigate(['/dashboard']).then(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      return;
+    }
+    this.closeMenu();
   }
 
   private isTypingTarget(target: EventTarget | null): boolean {
@@ -345,10 +391,18 @@ export class Shell {
     if (!link.path) {
       return false;
     }
-    const path = this.router.url.split('?')[0].split('#')[0];
-    if (link.key === 'dashboard' || link.key === 'tasks') {
-      return path === '/dashboard';
+    const path = this.currentPath();
+    if (path !== link.path) {
+      return false;
     }
-    return path === link.path;
+    const fragment = this.currentFragment();
+    // Same route, different jobs: Dashboard = page chrome; Tasks = #task-board.
+    if (link.fragment) {
+      return fragment === link.fragment;
+    }
+    if (link.key === 'dashboard') {
+      return fragment !== 'task-board';
+    }
+    return true;
   }
 }

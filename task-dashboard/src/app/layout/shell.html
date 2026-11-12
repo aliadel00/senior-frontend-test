@@ -316,7 +316,9 @@
               class="nav-link"
               [class.nav-link--active]="isActive(link)"
               [routerLink]="link.path"
-              (click)="closeMenu()"
+              [fragment]="link.fragment || undefined"
+              (click)="onNavClick(link, $event)"
+              [attr.aria-current]="isActive(link) ? 'page' : null"
               [attr.aria-keyshortcuts]="link.shortcut || null"
               [attr.title]="link.shortcut ? m()[link.key] + ' (' + link.shortcut + ')' : null"
             >
