@@ -35,8 +35,8 @@
   padding: 1rem 1.1rem;
   border-radius: var(--tm-radius);
   background: var(--tm-danger-soft);
-  border: 1px solid #fecaca;
-  color: #991b1b;
+  border: 1px solid color-mix(in srgb, var(--tm-danger) 35%, transparent);
+  color: var(--tm-danger);
 
   p {
     margin: 0;
@@ -52,9 +52,9 @@
 }
 
 .btn--ghost {
-  background: #fff;
-  border: 1px solid #fecaca;
-  color: #991b1b;
+  background: var(--tm-surface);
+  border: 1px solid color-mix(in srgb, var(--tm-danger) 35%, transparent);
+  color: var(--tm-danger);
 }
 
 @media (max-width: 1100px) {

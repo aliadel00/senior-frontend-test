@@ -6,7 +6,12 @@
 .bone {
   display: block;
   border-radius: 6px;
-  background: linear-gradient(90deg, #e8ebef 20%, #f4f6f8 40%, #e8ebef 60%);
+  background: linear-gradient(
+    90deg,
+    var(--tm-skeleton-a) 20%,
+    var(--tm-skeleton-b) 40%,
+    var(--tm-skeleton-a) 60%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.35s ease-in-out infinite;
 
@@ -307,7 +312,12 @@
 .skeleton__row {
   height: 3.5rem;
   border-radius: var(--tm-radius);
-  background: linear-gradient(90deg, #e8ebef 20%, #f4f6f8 40%, #e8ebef 60%);
+  background: linear-gradient(
+    90deg,
+    var(--tm-skeleton-a) 20%,
+    var(--tm-skeleton-b) 40%,
+    var(--tm-skeleton-a) 60%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.35s ease-in-out infinite;
 }
@@ -363,6 +373,6 @@
   .bone,
   .skeleton__row {
     animation: none;
-    background: #e8ebef;
+    background: var(--tm-skeleton-a);
   }
 }

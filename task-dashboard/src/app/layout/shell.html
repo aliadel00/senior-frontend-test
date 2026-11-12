@@ -70,6 +70,23 @@
 
     <div class="topbar__actions">
       <button
+        class="icon-btn icon-btn--theme theme-btn--topbar"
+        type="button"
+        [class.icon-btn--theme-dark]="theme.theme() === 'dark'"
+        [class.icon-btn--theme-pulse]="themePulse()"
+        [attr.aria-keyshortcuts]="'T'"
+        [attr.aria-label]="m().themeToggle"
+        [attr.title]="m().shortcutTheme + ' (T)'"
+        (click)="toggleTheme($event)"
+      >
+        <span class="theme-icon" aria-hidden="true">
+          <mat-icon class="theme-icon__moon" fontIcon="dark_mode">dark_mode</mat-icon>
+          <mat-icon class="theme-icon__sun" fontIcon="light_mode">light_mode</mat-icon>
+        </span>
+        <kbd class="hotkey hotkey--fab" aria-hidden="true">T</kbd>
+      </button>
+
+      <button
         class="icon-btn icon-btn--lang lang-btn--topbar"
         type="button"
         [attr.aria-keyshortcuts]="'L'"
@@ -271,6 +288,40 @@
       [attr.aria-label]="m().primaryNav"
     >
       <div class="sidebar__mobile-tools">
+        <div class="sidebar__theme" role="group" [attr.aria-label]="m().theme">
+          <span class="sidebar__lang-label" id="sidebar-theme-label">{{ m().theme }}</span>
+          <div
+            class="theme-switch"
+            role="radiogroup"
+            aria-labelledby="sidebar-theme-label"
+            [attr.aria-keyshortcuts]="'T'"
+            [attr.title]="m().shortcutTheme + ' (T)'"
+          >
+            <button
+              class="theme-switch__option"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="theme.theme() === 'light'"
+              [class.theme-switch__option--active]="theme.theme() === 'light'"
+              (click)="setTheme('light', $event)"
+            >
+              <mat-icon aria-hidden="true">light_mode</mat-icon>
+              <span>{{ m().themeLight }}</span>
+            </button>
+            <button
+              class="theme-switch__option"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="theme.theme() === 'dark'"
+              [class.theme-switch__option--active]="theme.theme() === 'dark'"
+              (click)="setTheme('dark', $event)"
+            >
+              <mat-icon aria-hidden="true">dark_mode</mat-icon>
+              <span>{{ m().themeDark }}</span>
+            </button>
+          </div>
+        </div>
+
         <div class="sidebar__lang" role="group" [attr.aria-label]="m().language">
           <span class="sidebar__lang-label" id="sidebar-lang-label">{{ m().language }}</span>
           <div

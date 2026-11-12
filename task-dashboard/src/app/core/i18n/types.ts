@@ -29,6 +29,10 @@ export interface Messages {
   language: string;
   localeEn: string;
   localeAr: string;
+  theme: string;
+  themeLight: string;
+  themeDark: string;
+  themeToggle: string;
   menuOpen: string;
   menuClose: string;
   skipToContent: string;
@@ -157,6 +161,7 @@ export interface Messages {
   shortcutAnalytics: string;
   shortcutTeam: string;
   shortcutLanguage: string;
+  shortcutTheme: string;
   shortcutMenu: string;
   shortcutHelp: string;
   shortcutClose: string;
