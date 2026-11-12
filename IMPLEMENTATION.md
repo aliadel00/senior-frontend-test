@@ -94,6 +94,10 @@ CDK `DragDropModule` board columns (`todo` / `in_progress` / `done`):
 - Confirm dialog before delete; snackbars for mutation feedback
 - Light enter/hover transitions on cards
 
+### 8. Deploy
+
+- `.github/workflows/deploy.yml` builds with `--configuration=pages` and deploys to GitHub Pages
+- Production uses `staticMockInterceptor` + `public/mock-db.json` so the Pages demo works without a Node API
 
 ## Testing
 

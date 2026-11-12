@@ -54,3 +54,29 @@ jobs:
         run: npm run test:lighthouse
         env:
           LHCI_SKIP_BUILD: '1'
+
+  docker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: task-dashboard
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate mock data for image
+        run: |
+          node ../data-fetching/generate-data.js
+          node mock-api/build-db.mjs
+          node -e "require('fs').copyFileSync('mock-api/db.json','public/mock-db.json')"
+
+      - name: Build docker images
+        run: docker compose build
+
+      - name: Smoke docker compose
+        run: |
+          docker compose up -d
+          sleep 8
+          curl -fsS http://127.0.0.1:3000/assignees >/dev/null
+          curl -fsS http://127.0.0.1:8080/ >/dev/null
+          docker compose down

@@ -82,6 +82,8 @@ Custom Node mock API (`mock-api/server.mjs`) shaped like the assignment response
   - lint, unit tests, **i18n parity**, content-a11y, production build
   - Playwright + **axe WCAG 2.1 AA** (critical + serious)
   - **Lighthouse** median score **> 90** (performance + accessibility)
+  - **Docker Compose** build + smoke (`:8080` web, `:3000` API)
+- GitHub Actions Deploy to GitHub Pages (`.github/workflows/deploy.yml`)
 - Docker + docker-compose (web on `:8080`, API on `:3000`)
 
 ```bash
@@ -93,6 +95,13 @@ docker compose up --build
 
 EN/AR catalogs live under `src/app/core/i18n/`. The top-bar language chip toggles locale + `dir`/`lang` on `<html>`. CI fails if catalogs drift (`npm run test:i18n`).
 
+### GitHub Pages deploy
+
+1. Repo **Settings → Pages → Source**: GitHub Actions
+2. Push to `main` (or run the **Deploy** workflow manually)
+3. Live app: `https://<user>.github.io/senior-frontend-test/`
+
+Production builds use `public/mock-db.json` + a static mock HTTP interceptor so the demo works without a Node API.
 
 ## Environment
 
