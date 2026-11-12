@@ -204,26 +204,37 @@ html.tm-theme-fading .mobile-search {
 }
 
 @media (max-width: 960px) {
-  /* Fixed + end-aligned so 92vw absolute panels don’t spill past the avatar. */
-  .notifications {
+  /*
+    Higher specificity than Angular emulated encapsulation
+    (.notifications[_ngcontent]), which otherwise keeps position:absolute + 92vw
+    and lets the panel spill past the viewport.
+  */
+  .shell .topbar .notify .notifications {
     position: fixed;
     top: calc(var(--tm-topbar-height) + 0.35rem);
-    inset-inline-end: 0.75rem;
-    inset-inline-start: auto;
-    width: min(380px, calc(100vw - 1.5rem));
-    max-height: min(70vh, calc(100dvh - var(--tm-topbar-height) - 0.75rem));
+    inset-inline: max(0.75rem, env(safe-area-inset-left, 0px))
+      max(0.75rem, env(safe-area-inset-right, 0px));
+    width: auto !important;
+    max-width: none;
+    max-height: min(
+      70vh,
+      calc(100dvh - var(--tm-topbar-height) - 0.75rem - env(safe-area-inset-bottom, 0px))
+    );
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
     z-index: 45;
   }
 
-  .notifications__list {
+  .shell .topbar .notify .notifications__list {
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
+    overflow: auto;
   }
 
-  .theme-btn--topbar {
+  .shell .topbar .theme-btn--topbar {
     display: none;
   }
 
