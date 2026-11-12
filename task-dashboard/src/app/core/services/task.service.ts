@@ -221,16 +221,39 @@ export class TaskService {
 
   /** Derives live statistics from current tasks (updates numbers without refetch). */
   computeLiveStatistics(tasks: Task[]): Statistic[] {
-    const overdue = tasks.filter((t) => t.status !== 'done' && this.computeOverdue(t.dueDate, t.status)).length;
+    const today = this.startOfToday();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const overdueTasks = tasks.filter(
+      (t) => t.status !== 'done' && this.computeOverdue(t.dueDate, t.status),
+    );
+    const createdThisWeek = tasks.filter((t) => {
+      const created = this.startOfDay(t.createdAt);
+      return created !== null && created >= weekAgo;
+    }).length;
+    const completedToday = tasks.filter((t) => {
+      if (t.status !== 'done') {
+        return false;
+      }
+      return this.isSameDay(t.completedAt ?? t.updatedAt, today);
+    }).length;
+    const inProgress = tasks.filter((t) => t.status === 'in_progress');
+    const inProgressMovedToday = inProgress.filter((t) => this.isSameDay(t.updatedAt, today)).length;
+    // Due yesterday → first calendar day the task counts as overdue.
+    const becameOverdueToday = overdueTasks.filter((t) => this.isSameDay(t.dueDate, yesterday)).length;
+
     return [
       {
         id: 'live-total',
         title: 'Total Tasks',
         icon: 'bar_chart',
         value: tasks.length,
-        change: `+${Math.max(tasks.length - 140, 0)}`,
+        change: this.formatDelta(createdThisWeek),
         changeLabel: 'this week',
-        changeType: 'positive',
+        changeType: createdThisWeek > 0 ? 'positive' : 'neutral',
         color: '#3B82F6',
       },
       {
@@ -238,32 +261,59 @@ export class TaskService {
         title: 'Completed',
         icon: 'check_circle',
         value: tasks.filter((t) => t.status === 'done').length,
-        change: '+8',
+        change: this.formatDelta(completedToday),
         changeLabel: 'today',
-        changeType: 'positive',
+        changeType: completedToday > 0 ? 'positive' : 'neutral',
         color: '#22C55E',
       },
       {
         id: 'live-progress',
         title: 'In Progress',
         icon: 'pending_actions',
-        value: tasks.filter((t) => t.status === 'in_progress').length,
-        change: '0',
-        changeLabel: 'Same as yesterday',
-        changeType: 'neutral',
+        value: inProgress.length,
+        change: this.formatDelta(inProgressMovedToday),
+        changeLabel: inProgressMovedToday > 0 ? 'today' : 'Same as yesterday',
+        changeType: inProgressMovedToday > 0 ? 'positive' : 'neutral',
         color: '#3B82F6',
       },
       {
         id: 'live-overdue',
         title: 'Overdue',
         icon: 'warning',
-        value: overdue,
-        change: overdue > 0 ? `+${overdue}` : '0',
+        value: overdueTasks.length,
+        change: this.formatDelta(becameOverdueToday),
         changeLabel: 'today',
-        changeType: overdue > 0 ? 'negative' : 'neutral',
+        changeType: becameOverdueToday > 0 ? 'negative' : 'neutral',
         color: '#EF4444',
       },
     ];
+  }
+
+  private formatDelta(count: number): string {
+    return count > 0 ? `+${count}` : '0';
+  }
+
+  private startOfToday(): Date {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  private startOfDay(value: string): Date | null {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  private isSameDay(value: string | null | undefined, day: Date): boolean {
+    if (!value) {
+      return false;
+    }
+    const parsed = this.startOfDay(value);
+    return parsed !== null && parsed.getTime() === day.getTime();
   }
 
   private parseTags(raw: string): string[] {
@@ -277,11 +327,9 @@ export class TaskService {
     if (status === 'done') {
       return false;
     }
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const due = new Date(dueDate);
-    due.setHours(0, 0, 0, 0);
-    return due < today;
+    const today = this.startOfToday();
+    const due = this.startOfDay(dueDate);
+    return due !== null && due < today;
   }
 
   private toError(err: unknown, fallback: string): Error {
