@@ -50,6 +50,9 @@ scripts/check-linear-history.sh
 # Local split tooling
 .split-final-snapshot/
 
+# Private interview notes (not part of the assessment deliverable)
+INTERVIEW_PREP.md
+
 # Test / perf artifacts
 **/test-results/
 **/playwright-report/

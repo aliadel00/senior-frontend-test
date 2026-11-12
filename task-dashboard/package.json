@@ -8,7 +8,7 @@
     "data:generate": "node ../data-fetching/generate-data.js && node mock-api/build-db.mjs && node -e \"require('fs').copyFileSync('mock-api/db.json','public/mock-db.json')\"",
     "dev": "concurrently -k -n api,web -c blue,green \"npm run api\" \"npm run start\"",
     "build": "ng build",
-    "build:pages": "ng build --configuration=pages",
+    "build:pages": "ng build --configuration=pages && node scripts/prepare-pages.mjs",
     "build:docker": "ng build --configuration=docker",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false",
