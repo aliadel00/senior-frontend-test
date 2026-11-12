@@ -42,9 +42,9 @@ const activity = tasksPayload.tasks
   }));
 
 const iconMap = {
-  '📊': 'assignment',
+  '📊': 'bar_chart',
   '✅': 'check_circle',
-  '🔄': 'autorenew',
+  '🔄': 'pending_actions',
   '⚠️': 'warning',
 };
 

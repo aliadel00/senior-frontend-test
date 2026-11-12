@@ -27,7 +27,7 @@ npm run dev
 | `npm test` | Unit tests (Vitest via Angular) |
 | `npm run lint` | ESLint |
 | `npm run build` | Production build |
-| `npm run ci` | Lint + test + build |
+| `npm run ci` | Lint + coverage tests + build |
 
 ## Architecture
 
@@ -36,7 +36,8 @@ See also the repo-root [`IMPLEMENTATION.md`](../IMPLEMENTATION.md) for detailed 
 - **Standalone components** with **OnPush** change detection
 - **Smart/presentational** split: `Dashboard` / `Users` orchestrate; cards, filters, charts stay dumb
 - **Signals** + `httpResource` for reactive reads; `HttpClient` for mutations
-- **Lazy-loaded** feature routes (`dashboard`, `users`)
+- **Lazy-loaded** feature routes (`dashboard`, `analytics`, `users`)
+- **Responsive shell**: desktop sidebar; mobile hamburger drawer
 - **Reactive forms** with custom validators (`title`, `dueDate`, `tags`)
 - **HTTP interceptors**: GET cache + retry with backoff
 - **CDK drag-and-drop** for column reorder / status changes
@@ -84,6 +85,12 @@ Custom Node mock API (`mock-api/server.mjs`) shaped like the assignment response
 docker compose up --build
 ```
 
+
+### Internationalization
+
+EN/AR catalogs live under `src/app/core/i18n/`. The top-bar language chip toggles locale + `dir`/`lang` on `<html>`. CI fails if catalogs drift (`npm run test:i18n`).
+
+
 ## Environment
 
 | Variable | Default | Notes |
@@ -97,8 +104,8 @@ docker compose up --build
 - Statistics from the seed file are illustrative; live counts also derive from tasks after mutations
 - No auth / multi-tenant roles
 - Drag-and-drop reorder persists via a custom endpoint (not standard JSON Server)
-- Bonus i18n / Lighthouse audit can be layered on without structural changes
-
 ## Design
 
 Figma: [senior-frontend](https://www.figma.com/design/inRRwrw0RP3v5eIXVx6grq/senior---frontend)
+
+The dashboard chrome matches the Figma **over-view** frame: Task Manager top bar + sidebar, four stat cards, status tabs / priority filter / New Task, and a three-column Kanban with priority badges and overdue tinting. Charts and activity sit below the board to satisfy assignment analytics requirements while keeping the primary viewport Figma-faithful.

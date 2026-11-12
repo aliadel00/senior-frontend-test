@@ -1,39 +1,39 @@
-<h2 mat-dialog-title>{{ isEdit ? 'Edit Task' : 'Create Task' }}</h2>
+<h2 mat-dialog-title>{{ isEdit ? m().editTaskTitle : m().createTaskTitle }}</h2>
 <form [formGroup]="form" (ngSubmit)="submit()">
   <mat-dialog-content class="task-form">
     <mat-form-field appearance="outline">
-      <mat-label>Title</mat-label>
+      <mat-label>{{ m().fieldTitle }}</mat-label>
       <input matInput formControlName="title" />
       @if (form.controls.title.hasError('required')) {
-        <mat-error>Title is required</mat-error>
+        <mat-error>{{ m().errTitleRequired }}</mat-error>
       } @else if (form.controls.title.hasError('minTitleLength')) {
-        <mat-error>Title must be at least 3 characters</mat-error>
+        <mat-error>{{ m().errTitleMin }}</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Description</mat-label>
+      <mat-label>{{ m().fieldDescription }}</mat-label>
       <textarea matInput rows="3" formControlName="description"></textarea>
       @if (form.controls.description.invalid && form.controls.description.touched) {
-        <mat-error>Description must be at least 10 characters</mat-error>
+        <mat-error>{{ m().errDescriptionMin }}</mat-error>
       }
     </mat-form-field>
 
     <div class="task-form__row">
       <mat-form-field appearance="outline">
-        <mat-label>Status</mat-label>
+        <mat-label>{{ m().fieldStatus }}</mat-label>
         <mat-select formControlName="status">
           @for (status of statuses; track status) {
-            <mat-option [value]="status">{{ statusLabels[status] }}</mat-option>
+            <mat-option [value]="status">{{ statusLabel(status) }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Priority</mat-label>
+        <mat-label>{{ m().fieldPriority }}</mat-label>
         <mat-select formControlName="priority">
           @for (priority of priorities; track priority) {
-            <mat-option [value]="priority">{{ priorityLabels[priority] }}</mat-option>
+            <mat-option [value]="priority">{{ priorityLabel(priority) }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -41,47 +41,60 @@
 
     <div class="task-form__row">
       <mat-form-field appearance="outline">
-        <mat-label>Due date</mat-label>
-        <input matInput type="date" formControlName="dueDate" />
+        <mat-label>{{ m().fieldDueDate }}</mat-label>
+        <input
+          matInput
+          [matDatepicker]="duePicker"
+          formControlName="dueDate"
+          autocomplete="off"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
+        <mat-datepicker #duePicker></mat-datepicker>
         @if (form.controls.dueDate.invalid && form.controls.dueDate.touched) {
-          <mat-error>Enter a valid date</mat-error>
+          <mat-error>{{ m().errValidDate }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Assignee</mat-label>
+        <mat-label>{{ m().fieldAssignee }}</mat-label>
         <mat-select formControlName="assigneeId">
           @for (user of data.assignees; track user.id) {
             <mat-option [value]="user.id">{{ user.name }}</mat-option>
           }
         </mat-select>
         @if (form.controls.assigneeId.invalid && form.controls.assigneeId.touched) {
-          <mat-error>Assignee is required</mat-error>
+          <mat-error>{{ m().errAssigneeRequired }}</mat-error>
         }
       </mat-form-field>
     </div>
 
     <mat-form-field appearance="outline">
-      <mat-label>Tags (comma separated)</mat-label>
+      <mat-label>{{ m().fieldTags }}</mat-label>
       <input matInput formControlName="tags" />
       @if (form.controls.tags.hasError('maxTags')) {
-        <mat-error>Maximum 5 tags</mat-error>
+        <mat-error>{{ m().errMaxTags }}</mat-error>
       } @else if (form.controls.tags.hasError('tagTooLong')) {
-        <mat-error>Each tag must be 20 characters or fewer</mat-error>
+        <mat-error>{{ m().errTagTooLong }}</mat-error>
       }
     </mat-form-field>
 
     <div class="task-form__quick-tags">
-      <button mat-stroked-button type="button" (click)="addQuickTag('Frontend')">+ Frontend</button>
-      <button mat-stroked-button type="button" (click)="addQuickTag('Backend')">+ Backend</button>
-      <button mat-stroked-button type="button" (click)="addQuickTag('Bug Fix')">+ Bug Fix</button>
+      <button mat-stroked-button type="button" (click)="addQuickTag('Frontend')">
+        {{ m().quickTagFrontend }}
+      </button>
+      <button mat-stroked-button type="button" (click)="addQuickTag('Backend')">
+        {{ m().quickTagBackend }}
+      </button>
+      <button mat-stroked-button type="button" (click)="addQuickTag('Bug Fix')">
+        {{ m().quickTagBugFix }}
+      </button>
     </div>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-button type="button" (click)="cancel()">{{ m().cancel }}</button>
     <button mat-flat-button color="primary" type="submit">
-      {{ isEdit ? 'Save changes' : 'Create task' }}
+      {{ isEdit ? m().saveChanges : m().createTask }}
     </button>
   </mat-dialog-actions>
 </form>

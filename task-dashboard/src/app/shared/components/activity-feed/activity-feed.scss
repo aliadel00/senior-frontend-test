@@ -1,9 +1,40 @@
-.activity h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.1rem;
-}
-
 .activity__empty {
   margin: 0;
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--tm-text-soft);
+  font-size: 0.85rem;
+}
+
+.feed {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.feed__item {
+  display: grid;
+  gap: 0.15rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--tm-border);
+
+  &:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.feed__title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tm-text);
+}
+
+.feed__meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--tm-text-muted);
 }

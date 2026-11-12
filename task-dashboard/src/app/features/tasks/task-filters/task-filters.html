@@ -1,57 +1,59 @@
-<section class="filters" aria-label="Task filters">
-  <mat-form-field appearance="outline" class="filters__search">
-    <mat-label>Search tasks</mat-label>
-    <input
-      matInput
-      type="search"
-      [ngModel]="filters().search"
-      (ngModelChange)="searchChange.emit($event)"
-      placeholder="Title or description"
-    />
-    <mat-icon matSuffix aria-hidden="true">search</mat-icon>
-  </mat-form-field>
+<section class="filters" [attr.aria-label]="m().taskFilters">
+  <div class="filters__tabs" role="tablist" [attr.aria-label]="m().statusFilter" tabindex="0">
+    @for (tab of statusTabs(); track tab.value) {
+      <button
+        type="button"
+        class="tab"
+        role="tab"
+        [class.tab--active]="filters().status === tab.value"
+        [attr.aria-selected]="filters().status === tab.value"
+        (click)="statusChange.emit(tab.value)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </div>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Status</mat-label>
-    <mat-select
-      [ngModel]="filters().status"
-      (ngModelChange)="statusChange.emit($event)"
-    >
-      <mat-option value="all">All</mat-option>
-      @for (status of statuses; track status) {
-        <mat-option [value]="status">{{ statusLabels[status] }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+  <div class="filters__actions">
+    <label class="select" [class.select--placeholder]="filters().priority === 'all'">
+      <span class="sr-only">{{ m().filterPriority }}</span>
+      <select
+        [ngModel]="priorityValue()"
+        (ngModelChange)="onPriorityChange($event)"
+        [attr.aria-label]="m().filterByPriority"
+      >
+        <option value="" disabled hidden>{{ m().filterPriority }}</option>
+        <option value="all">{{ m().filterNone }}</option>
+        @for (priority of priorities; track priority) {
+          <option [value]="priority">{{ priorityLabel(priority) }}</option>
+        }
+      </select>
+      <span class="select__chevron" aria-hidden="true">
+        <mat-icon>expand_more</mat-icon>
+      </span>
+    </label>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Priority</mat-label>
-    <mat-select
-      [ngModel]="filters().priority"
-      (ngModelChange)="priorityChange.emit($event)"
-    >
-      <mat-option value="all">All</mat-option>
-      @for (priority of priorities; track priority) {
-        <mat-option [value]="priority">{{ priorityLabels[priority] }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+    <label class="select" [class.select--placeholder]="filters().assigneeId === 'all'">
+      <span class="sr-only">{{ m().filterAssignee }}</span>
+      <select
+        [ngModel]="assigneeValue()"
+        (ngModelChange)="onAssigneeChange($event)"
+        [attr.aria-label]="m().filterByAssignee"
+      >
+        <option value="" disabled hidden>{{ m().filterAssignee }}</option>
+        <option value="all">{{ m().filterNone }}</option>
+        @for (user of assignees(); track user.id) {
+          <option [value]="user.id">{{ user.name }}</option>
+        }
+      </select>
+      <span class="select__chevron" aria-hidden="true">
+        <mat-icon>expand_more</mat-icon>
+      </span>
+    </label>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Assignee</mat-label>
-    <mat-select
-      [ngModel]="filters().assigneeId"
-      (ngModelChange)="assigneeChange.emit($event)"
-    >
-      <mat-option value="all">All</mat-option>
-      @for (user of assignees(); track user.id) {
-        <mat-option [value]="user.id">{{ user.name }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-
-  <button mat-stroked-button type="button" (click)="cleared.emit()">
-    <mat-icon>filter_alt_off</mat-icon>
-    Reset
-  </button>
+    <button class="btn-primary" type="button" (click)="createRequested.emit()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      {{ m().newTask }}
+    </button>
+  </div>
 </section>

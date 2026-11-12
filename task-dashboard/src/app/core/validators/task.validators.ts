@@ -14,17 +14,23 @@ export function titleValidator(): ValidatorFn {
   };
 }
 
-/** Ensures due date is a valid ISO date string (YYYY-MM-DD). */
+/** Ensures due date is a valid Date or ISO date string (YYYY-MM-DD). */
 export function dueDateValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    const value = String(control.value ?? '').trim();
-    if (!value) {
+    const value = control.value;
+    if (value == null || value === '') {
       return { required: true };
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? { invalidDate: true } : null;
+    }
+
+    const raw = String(value).trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
       return { invalidDate: true };
     }
-    const parsed = new Date(value);
+    const parsed = new Date(`${raw}T00:00:00`);
     if (Number.isNaN(parsed.getTime())) {
       return { invalidDate: true };
     }
@@ -51,4 +57,31 @@ export function tagsValidator(): ValidatorFn {
     }
     return null;
   };
+}
+
+/** Parses an API ISO date (YYYY-MM-DD) into a local Date for the calendar. */
+export function parseIsoDate(value?: string | null): Date | null {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+/** Formats a Date (or ISO string) to YYYY-MM-DD for the API. */
+export function toIsoDate(value: Date | string | null | undefined): string {
+  if (value == null || value === '') {
+    return '';
+  }
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+  if (!(value instanceof Date) || Number.isNaN(value.getTime())) {
+    return '';
+  }
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, '0');
+  const day = String(value.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }

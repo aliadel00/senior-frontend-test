@@ -1,19 +1,17 @@
-<section class="activity" aria-labelledby="activity-heading">
-  <h2 id="activity-heading">Recent Activity</h2>
+<section class="activity" [attr.aria-label]="m().activityAria">
   @if (!items().length) {
-    <p class="activity__empty">No recent activity yet.</p>
+    <p class="activity__empty">{{ m().activityEmpty }}</p>
   } @else {
-    <mat-nav-list>
+    <ul class="feed" tabindex="0" [attr.aria-label]="m().activityItems">
       @for (item of items(); track item.id) {
-        <mat-list-item>
-          <mat-icon matListItemIcon aria-hidden="true">history</mat-icon>
-          <span matListItemTitle>{{ item.taskTitle }}</span>
-          <span matListItemLine>
-            {{ item.actor }} · {{ item.action | titlecase }} ·
+        <li class="feed__item">
+          <p class="feed__title">{{ item.taskTitle }}</p>
+          <p class="feed__meta">
+            {{ item.actor }} · {{ actionLabel(item.action) }} ·
             {{ item.timestamp | date: 'short' }}
-          </span>
-        </mat-list-item>
+          </p>
+        </li>
       }
-    </mat-nav-list>
+    </ul>
   }
 </section>

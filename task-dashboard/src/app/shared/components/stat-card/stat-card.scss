@@ -1,11 +1,20 @@
 .stat-card {
-  height: 100%;
-  border-left: 4px solid var(--accent, #1976d2);
-  padding: 1rem 1.25rem;
-  animation: rise-in 0.35s ease both;
+  background: var(--tm-surface);
+  border: 1px solid var(--tm-border);
+  border-radius: var(--tm-radius);
+  box-shadow: var(--tm-shadow);
+  padding: 1rem 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+  }
 }
 
-.stat-card__header {
+.stat-card__top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -13,47 +22,61 @@
 }
 
 .stat-card__title {
+  margin: 0;
+  color: var(--tm-text-muted);
   font-size: 0.875rem;
-  color: var(--mat-sys-on-surface-variant);
+  font-weight: 500;
 }
 
 .stat-card__icon {
-  color: var(--accent, #1976d2);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--tm-primary-soft);
+  color: var(--tm-primary);
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.stat-card[data-tone='success'] .stat-card__icon {
+  background: var(--tm-success-soft);
+  color: var(--tm-success);
+}
+
+.stat-card[data-tone='warning'] .stat-card__icon {
+  background: #eff6ff;
+  color: var(--tm-primary);
+}
+
+.stat-card[data-tone='danger'] .stat-card__icon {
+  background: var(--tm-danger-soft);
+  color: var(--tm-danger);
 }
 
 .stat-card__value {
-  margin: 0.5rem 0 0.25rem;
+  margin: 0;
   font-size: 1.75rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tm-text);
 }
 
 .stat-card__change {
   margin: 0;
-  display: flex;
-  gap: 0.35rem;
   font-size: 0.8rem;
-}
+  color: var(--tm-text-muted);
 
-.stat-card__change--positive {
-  color: #2e7d32;
-}
-
-.stat-card__change--negative {
-  color: #c62828;
-}
-
-.stat-card__change--neutral {
-  color: var(--mat-sys-on-surface-variant);
-}
-
-@keyframes rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
+  &--positive {
+    color: var(--tm-success);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &--negative {
+    color: var(--tm-danger);
   }
 }

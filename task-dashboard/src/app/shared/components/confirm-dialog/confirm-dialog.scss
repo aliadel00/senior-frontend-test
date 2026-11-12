@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.confirm-dialog__danger {
+  margin-inline-start: 0.35rem;
+  --mdc-filled-button-container-color: var(--tm-danger);
+  --mdc-filled-button-label-text-color: #fff;
+  --mat-button-filled-container-color: var(--tm-danger);
+  --mat-button-filled-label-text-color: #fff;
+
+  &:hover,
+  &:focus-visible {
+    --mdc-filled-button-container-color: #991b1b;
+    --mat-button-filled-container-color: #991b1b;
+  }
+}

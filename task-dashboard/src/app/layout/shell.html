@@ -1,30 +1,311 @@
-<mat-sidenav-container class="shell">
-  <mat-sidenav mode="side" opened class="shell__nav" [fixedInViewport]="true">
-    <div class="shell__brand">
-      <mat-icon aria-hidden="true">task_alt</mat-icon>
-      <span>TaskFlow</span>
-    </div>
-    <mat-nav-list>
-      @for (link of links; track link.path) {
-        <a
-          mat-list-item
-          [routerLink]="link.path"
-          routerLinkActive="active"
-          [attr.aria-label]="link.label"
-        >
-          <mat-icon matListItemIcon aria-hidden="true">{{ link.icon }}</mat-icon>
-          <span matListItemTitle>{{ link.label }}</span>
-        </a>
-      }
-    </mat-nav-list>
-  </mat-sidenav>
+<a class="skip-link" href="#main-content">{{ m().skipToContent }}</a>
 
-  <mat-sidenav-content>
-    <mat-toolbar color="primary" class="shell__toolbar">
-      <span>Senior Frontend Assessment</span>
-    </mat-toolbar>
-    <main class="shell__content">
+<div
+  class="shell"
+  [class.shell--menu-open]="menuOpen()"
+  [class.shell--locale-out]="localePhase() === 'out'"
+  [class.shell--locale-in]="localePhase() === 'in'"
+  [attr.data-locale]="i18n.locale()"
+>
+  <header class="topbar">
+    <div class="topbar__leading">
+      <button
+        class="icon-btn menu-toggle"
+        type="button"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="app-sidebar"
+        [attr.aria-label]="menuOpen() ? m().menuClose : m().menuOpen"
+        [attr.aria-keyshortcuts]="'M'"
+        [attr.title]="m().shortcutMenu + ' (M)'"
+      >
+        <mat-icon aria-hidden="true">{{ menuOpen() ? 'close' : 'menu' }}</mat-icon>
+        <kbd class="hotkey hotkey--fab" aria-hidden="true">M</kbd>
+      </button>
+
+      <a class="brand" routerLink="/dashboard" [attr.title]="m().brandHome">
+        <span class="brand__mark" aria-hidden="true">
+          <mat-icon fontIcon="assignment" aria-hidden="true">assignment</mat-icon>
+        </span>
+        <span class="brand__name">{{ m().brand }}</span>
+      </a>
+    </div>
+
+    <div class="search search--topbar" [attr.title]="m().shortcutSearch + ' (/)'">
+      <mat-icon aria-hidden="true">search</mat-icon>
+      <input
+        #searchInput
+        type="search"
+        [placeholder]="m().searchPlaceholder"
+        [ngModel]="search().search"
+        (ngModelChange)="onSearch($event)"
+        [attr.aria-label]="m().searchAria"
+        [attr.aria-keyshortcuts]="'/'"
+      />
+      @if (search().search.trim()) {
+        <button
+          class="search__clear"
+          type="button"
+          [attr.aria-label]="m().clearSearch"
+          (click)="clearSearch()"
+        >
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      }
+      <kbd class="hotkey" aria-hidden="true">/</kbd>
+    </div>
+
+    <div class="topbar__actions">
+      <button
+        class="icon-btn icon-btn--lang lang-btn--topbar"
+        type="button"
+        [attr.aria-keyshortcuts]="'L'"
+        [attr.title]="m().shortcutLanguage + ' (L)'"
+        (click)="toggleLanguage()"
+      >
+        <span class="lang-chip" [attr.data-locale]="i18n.locale()">
+          {{ i18n.locale() === 'en' ? 'AR' : 'EN' }}
+        </span>
+        <span class="sr-only">{{ m().language }}</span>
+        <kbd class="hotkey hotkey--fab" aria-hidden="true">L</kbd>
+      </button>
+
+      <div class="notify" [class.notify--open]="notificationsOpen()">
+        <button
+          class="icon-btn icon-btn--notify"
+          type="button"
+          [attr.aria-expanded]="notificationsOpen()"
+          aria-controls="notifications-panel"
+          [attr.aria-keyshortcuts]="'B'"
+          [attr.title]="m().shortcutNotifications + ' (B)'"
+          (click)="toggleNotifications()"
+        >
+          <span class="sr-only">
+            {{
+              notifications.unreadCount() > 0
+                ? m().notifications + ' (' + notifications.unreadCount() + ')'
+                : m().notifications
+            }}
+          </span>
+          <span class="icon-glyph icon-glyph--notify" aria-hidden="true"></span>
+          @if (notifications.unreadCount() > 0) {
+            <span class="badge" aria-hidden="true">{{ notifications.unreadCount() }}</span>
+          }
+          <kbd class="hotkey hotkey--fab" aria-hidden="true">B</kbd>
+        </button>
+
+        @if (notificationsOpen()) {
+          <div
+            id="notifications-panel"
+            class="notifications"
+            role="dialog"
+            [attr.aria-label]="m().notifications"
+          >
+            <div class="notifications__header">
+              <div class="notifications__heading">
+                <strong>{{ m().notifications }}</strong>
+                @if (notifications.unreadCount() > 0) {
+                  <span class="notifications__count">{{ notifications.unreadCount() }}</span>
+                }
+              </div>
+              @if (notifications.unreadCount() > 0) {
+                <button type="button" class="linkish" (click)="markNotificationsRead()">
+                  {{ m().markAllRead }}
+                </button>
+              }
+            </div>
+
+            <div class="notifications__tabs" role="tablist" [attr.aria-label]="m().notifications">
+              <button
+                type="button"
+                class="notifications__tab"
+                role="tab"
+                [class.notifications__tab--active]="notifications.filter() === 'all'"
+                [attr.aria-selected]="notifications.filter() === 'all'"
+                (click)="setNotifyFilter('all')"
+              >
+                {{ m().notifyFilterAll }}
+                <span class="notifications__tab-count">{{ notifications.items().length }}</span>
+              </button>
+              <button
+                type="button"
+                class="notifications__tab"
+                role="tab"
+                [class.notifications__tab--active]="notifications.filter() === 'unread'"
+                [attr.aria-selected]="notifications.filter() === 'unread'"
+                (click)="setNotifyFilter('unread')"
+              >
+                {{ m().notifyFilterUnread }}
+                <span class="notifications__tab-count">{{ notifications.unreadCount() }}</span>
+              </button>
+            </div>
+
+            @if (!notifications.visibleItems().length) {
+              <div class="notifications__empty">
+                <span class="notifications__empty-icon" aria-hidden="true">
+                  <mat-icon>{{ notifications.filter() === 'unread' ? 'mark_email_read' : 'notifications_none' }}</mat-icon>
+                </span>
+                <p>
+                  {{
+                    notifications.filter() === 'unread'
+                      ? m().notificationsEmptyUnread
+                      : m().notificationsEmpty
+                  }}
+                </p>
+                <p class="notifications__hint">{{ m().notificationsHint }}</p>
+              </div>
+            } @else {
+              <ul class="notifications__list">
+                @for (item of notifications.visibleItems(); track item.id) {
+                  <li>
+                    <button
+                      type="button"
+                      class="notifications__item"
+                      [class.notifications__item--unread]="item.unread"
+                      (click)="openNotification(item, $event)"
+                      [attr.aria-label]="m().notifyOpenTask + ': ' + item.taskTitle"
+                    >
+                      <span
+                        class="notifications__icon"
+                        [attr.data-tone]="item.tone"
+                        aria-hidden="true"
+                      >
+                        <mat-icon>{{ item.icon }}</mat-icon>
+                      </span>
+                      <span class="notifications__body">
+                        <span class="notifications__summary">{{ item.summary }}</span>
+                        <span class="notifications__title">{{ item.taskTitle }}</span>
+                        <span class="notifications__meta">
+                          <time [attr.datetime]="item.timestamp">{{ item.relativeTime }}</time>
+                        </span>
+                      </span>
+                      @if (item.unread) {
+                        <span class="notifications__dot" aria-hidden="true"></span>
+                      }
+                    </button>
+                  </li>
+                }
+              </ul>
+              <a class="notifications__footer" routerLink="/analytics" (click)="closeNotifications()">
+                {{ m().viewActivity }}
+                <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+              </a>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="avatar" [attr.aria-label]="m().currentUser" title="JD">JD</div>
+    </div>
+  </header>
+
+  <div class="shell__body">
+    <div
+      class="sidebar-backdrop"
+      [class.sidebar-backdrop--visible]="menuOpen()"
+      (click)="closeMenu()"
+      aria-hidden="true"
+    ></div>
+
+    <aside
+      id="app-sidebar"
+      class="sidebar"
+      [class.sidebar--open]="menuOpen()"
+      [attr.aria-label]="m().primaryNav"
+    >
+      <div class="sidebar__mobile-tools">
+        <div class="search search--sidebar" [attr.title]="m().shortcutSearch + ' (/)'">
+          <mat-icon aria-hidden="true">search</mat-icon>
+          <input
+            #mobileSearchInput
+            type="search"
+            [placeholder]="m().searchPlaceholder"
+            [ngModel]="search().search"
+            (ngModelChange)="onSearch($event)"
+            [attr.aria-label]="m().searchAria"
+            [attr.aria-keyshortcuts]="'/'"
+          />
+          @if (search().search.trim()) {
+            <button
+              class="search__clear"
+              type="button"
+              [attr.aria-label]="m().clearSearch"
+              (click)="clearSearch()"
+            >
+              <mat-icon aria-hidden="true">close</mat-icon>
+            </button>
+          }
+        </div>
+
+        <button
+          class="sidebar__lang"
+          type="button"
+          [attr.aria-keyshortcuts]="'L'"
+          [attr.title]="m().shortcutLanguage + ' (L)'"
+          (click)="toggleLanguage()"
+        >
+          <span class="lang-chip" [attr.data-locale]="i18n.locale()">
+            {{ i18n.locale() === 'en' ? m().localeAr : m().localeEn }}
+          </span>
+          <span>{{ m().language }}</span>
+        </button>
+      </div>
+
+      <nav class="sidebar__nav">
+        @for (link of links; track link.key) {
+          @if (link.disabled) {
+            <span class="nav-link nav-link--disabled" aria-disabled="true">
+              <mat-icon aria-hidden="true">{{ link.icon }}</mat-icon>
+              <span>{{ m()[link.key] }}</span>
+            </span>
+          } @else {
+            <a
+              class="nav-link"
+              [class.nav-link--active]="isActive(link)"
+              [routerLink]="link.path"
+              (click)="closeMenu()"
+              [attr.aria-keyshortcuts]="link.shortcut || null"
+              [attr.title]="link.shortcut ? m()[link.key] + ' (' + link.shortcut + ')' : null"
+            >
+              <mat-icon aria-hidden="true">{{ link.icon }}</mat-icon>
+              <span>{{ m()[link.key] }}</span>
+              @if (link.shortcut) {
+                <kbd class="hotkey" aria-hidden="true">{{ link.shortcut }}</kbd>
+              }
+            </a>
+          }
+        }
+      </nav>
+
+      <div class="sidebar__footer">
+        <button
+          class="shortcuts-btn"
+          type="button"
+          (click)="openShortcuts()"
+          [attr.aria-label]="m().shortcutsTitle"
+          [attr.aria-keyshortcuts]="'?'"
+          [attr.title]="m().shortcutHelp + ' (?)'"
+        >
+          <mat-icon aria-hidden="true">keyboard</mat-icon>
+          <span>{{ m().shortcuts }}</span>
+          <kbd class="hotkey" aria-hidden="true">?</kbd>
+        </button>
+        <button
+          class="new-task"
+          type="button"
+          (click)="onNewTask()"
+          [attr.aria-keyshortcuts]="'N'"
+          [attr.title]="m().shortcutNewTask + ' (N)'"
+        >
+          <mat-icon aria-hidden="true">add</mat-icon>
+          <span>{{ m().newTask }}</span>
+          <kbd class="hotkey hotkey--on-primary" aria-hidden="true">N</kbd>
+        </button>
+      </div>
+    </aside>
+
+    <main id="main-content" class="shell__content" tabindex="-1">
       <router-outlet />
     </main>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </div>
+</div>

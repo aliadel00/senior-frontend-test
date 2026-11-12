@@ -1,39 +1,116 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+
+:root {
+  --tm-bg: #f3f4f6;
+  --tm-surface: #ffffff;
+  --tm-border: #e5e7eb;
+  --tm-border-strong: #d1d5db;
+  --tm-text: #111827;
+  --tm-text-muted: #374151;
+  --tm-text-soft: #4b5563;
+  /* Blue-700 meets WCAG AA for white text at small sizes */
+  --tm-primary: #1d4ed8;
+  --tm-primary-hover: #1e40af;
+  --tm-primary-soft: #dbeafe;
+  --tm-danger: #b91c1c;
+  --tm-danger-soft: #fef2f2;
+  --tm-warning: #b45309;
+  --tm-warning-soft: #fffbeb;
+  --tm-success: #15803d;
+  --tm-success-soft: #f0fdf4;
+  --tm-sidebar-width: 220px;
+  --tm-topbar-height: 64px;
+  --tm-radius: 12px;
+  --tm-radius-sm: 8px;
+  --tm-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --tm-font: 'Inter', 'Noto Sans Arabic', system-ui, -apple-system, sans-serif;
+}
+
+html[lang='ar'] {
+  --tm-font: 'Noto Sans Arabic', 'Inter', system-ui, -apple-system, sans-serif;
+}
 
 html {
   height: 100%;
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        primary: mat.$blue-palette,
+        tertiary: mat.$azure-palette,
       ),
-      typography: Roboto,
+      typography: (
+        plain-family: Inter,
+        brand-family: Inter,
+      ),
       density: 0,
     )
   );
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
   height: 100%;
+  background: var(--tm-bg);
+  color: var(--tm-text);
+  font-family: var(--tm-font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
-/* You can add global styles to this file, and also import other style files */
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Entrance micro-animations for loaded content.
+   End with transform:none — a leftover translateY(0) creates a containing
+   block that breaks CDK drag preview positioning (card jumps to top-left). */
+.enter-item {
+  --enter-i: 0;
+  animation: tm-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--enter-i) * 55ms);
+}
+
+@keyframes tm-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-item {
+    animation: none;
+  }
+}
+
+/* Preview is portaled to <body>, so these must be global. */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: var(--tm-radius);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.16);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms ease;
+}

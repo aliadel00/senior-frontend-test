@@ -71,7 +71,8 @@ Reactive `TaskForm` dialog with:
 ### 5. Performance
 
 - `ChangeDetectionStrategy.OnPush` on feature and shared components
-- Lazy routes for `dashboard` and `users`
+- Lazy routes for `dashboard`, `analytics`, and `users`
+- Mobile shell uses a hamburger + overlay drawer under 960px
 - `@for` track-by via task `id` / status
 - GET cache interceptor (cleared on mutations)
 - Retry interceptor (GET, exponential backoff)
@@ -86,11 +87,13 @@ CDK `DragDropModule` board columns (`todo` / `in_progress` / `done`):
 
 ### 7. Styling / UX
 
-- Material 3 theme (azure palette)
+- Visual UI aligned to the assignment Figma (`Task Manager` overview): top search bar, sidebar nav, stat cards, status tabs, Kanban board, priority pills, overdue card tint
+- Design tokens in `styles.scss` (Inter + blue `#3B82F6` system)
 - Responsive grids for stats, charts, filters, and board columns
 - Skeleton loader while resources load
 - Confirm dialog before delete; snackbars for mutation feedback
 - Light enter/hover transitions on cards
+
 
 ## Testing
 
@@ -102,13 +105,16 @@ CDK `DragDropModule` board columns (`todo` / `in_progress` / `done`):
 | Task service | CRUD + live statistics |
 | Components | `StatCard`, `TaskForm`, `App` |
 
-Local CI (`npm run ci`) runs lint → tests with coverage → production build. Target: **≥ 80%** statement/line coverage on exercised modules.
+Local CI (`npm run ci`) runs lint → coverage tests → i18n parity → content-a11y → production build → axe WCAG 2.1 AA → Lighthouse (>90). Target: **≥ 80%** statement/line coverage on exercised modules.
 
 ## Tooling & delivery extras
 
 - **Husky + lint-staged** — ESLint/Prettier on commit
-- **GitHub Actions** — `.github/workflows/ci.yml` (Node 22)
+- **GitHub Actions** — `.github/workflows/ci.yml` (Node 22): unit tests, i18n, a11y (axe), Lighthouse >90, Docker Compose smoke
 - **Docker** — `Dockerfile` + `docker-compose.yml` (nginx web + API)
+- **i18n** — EN/AR catalogs + language toggle (`I18nService`)
+- **Accessibility** — skip link, semantic landmarks, Playwright axe gate (critical + serious)
+- **Performance** — LHCI with 5-run median, category score floor 0.9
 - **README** — setup, architecture, scripts, limitations
 
 ## Trade-offs / known limitations
@@ -132,7 +138,7 @@ npm run dev
 - API: http://localhost:3000  
 
 ```bash
-npm run ci   # lint + coverage tests + build
+npm run ci   # lint + coverage + i18n + a11y + build + Lighthouse
 ```
 
 ## Mapping to evaluation criteria

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -6,22 +6,28 @@ import {
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { DateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { I18nService } from '../../../core/i18n/i18n.service';
 import {
   Assignee,
-  PRIORITY_LABELS,
-  STATUS_LABELS,
   TASK_PRIORITIES,
   TASK_STATUSES,
   Task,
   TaskFormValue,
+  TaskPriority,
+  TaskStatus,
 } from '../../../core/models/task.model';
 import {
   dueDateValidator,
+  parseIsoDate,
   tagsValidator,
   titleValidator,
+  toIsoDate,
 } from '../../../core/validators/task.validators';
 
 export interface TaskFormDialogData {
@@ -35,7 +41,9 @@ export interface TaskFormDialogData {
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
+    MatDatepickerModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatSelectModule,
   ],
@@ -46,23 +54,38 @@ export interface TaskFormDialogData {
 export class TaskForm {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<TaskForm, TaskFormValue | null>);
+  private readonly i18n = inject(I18nService);
+  private readonly dateAdapter = inject(DateAdapter);
   readonly data = inject<TaskFormDialogData>(MAT_DIALOG_DATA);
 
   readonly statuses = TASK_STATUSES;
   readonly priorities = TASK_PRIORITIES;
-  readonly statusLabels = STATUS_LABELS;
-  readonly priorityLabels = PRIORITY_LABELS;
   readonly isEdit = !!this.data.task;
+  readonly m = computed(() => this.i18n.messages());
 
   readonly form = this.fb.nonNullable.group({
     title: [this.data.task?.title ?? '', [Validators.required, titleValidator()]],
     description: [this.data.task?.description ?? '', [Validators.required, Validators.minLength(10)]],
     status: [this.data.task?.status ?? ('todo' as const), Validators.required],
     priority: [this.data.task?.priority ?? ('medium' as const), Validators.required],
-    dueDate: [this.data.task?.dueDate ?? '', [Validators.required, dueDateValidator()]],
+    dueDate: [parseIsoDate(this.data.task?.dueDate) as Date | null, [Validators.required, dueDateValidator()]],
     assigneeId: [this.data.task?.assignee.id ?? '', Validators.required],
     tags: [this.data.task?.tags.join(', ') ?? '', tagsValidator()],
   });
+
+  constructor() {
+    effect(() => {
+      this.dateAdapter.setLocale(this.i18n.locale() === 'ar' ? 'ar' : 'en-US');
+    });
+  }
+
+  statusLabel(status: TaskStatus): string {
+    return this.i18n.statusLabel(status);
+  }
+
+  priorityLabel(priority: TaskPriority): string {
+    return this.i18n.priorityLabel(priority);
+  }
 
   /** Dynamically exposes a tags control helper for tests / future expansions. */
   addQuickTag(tag: string): void {
@@ -81,6 +104,11 @@ export class TaskForm {
       this.form.markAllAsTouched();
       return;
     }
-    this.dialogRef.close(this.form.getRawValue());
+    const raw = this.form.getRawValue();
+    const value: TaskFormValue = {
+      ...raw,
+      dueDate: toIsoDate(raw.dueDate),
+    };
+    this.dialogRef.close(value);
   }
 }

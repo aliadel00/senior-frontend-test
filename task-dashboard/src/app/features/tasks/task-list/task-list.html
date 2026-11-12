@@ -1,8 +1,8 @@
 <div class="board" cdkDropListGroup>
   @for (status of columns; track status) {
-    <section class="board__column" [attr.aria-label]="statusLabels[status] + ' column'">
+    <section class="board__column" [attr.aria-label]="columnAria(status)">
       <header class="board__header">
-        <h2>{{ statusLabels[status] }}</h2>
+        <h2>{{ statusLabel(status) }}</h2>
         <span class="board__count">{{ tasksByStatus(status).length }}</span>
       </header>
 
@@ -22,7 +22,7 @@
             />
           </div>
         } @empty {
-          <p class="board__empty">No tasks</p>
+          <p class="board__empty">{{ m().noTasks }}</p>
         }
       </div>
     </section>

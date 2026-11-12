@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  min-width: min(100%, 22rem);
+}
+
+.shortcuts-dialog__intro {
+  margin: 0 0 1rem;
+  color: var(--tm-text-soft);
+  font-size: 0.9rem;
+}
+
+.shortcuts-dialog__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.shortcuts-dialog__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--tm-border);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.shortcuts-dialog__label {
+  color: var(--tm-text);
+  font-size: 0.92rem;
+}
+
+.shortcuts-dialog__keys {
+  display: inline-flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--tm-border-strong);
+  border-radius: 6px;
+  background: var(--tm-bg);
+  color: var(--tm-text);
+  font-family: var(--tm-font);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: 0 1px 0 var(--tm-border-strong);
+}

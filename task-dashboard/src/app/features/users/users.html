@@ -1,23 +1,22 @@
 <section class="users">
   <header>
-    <h1>Team</h1>
-    <p>Assignees available for task ownership.</p>
+    <h1>{{ m().teamTitle }}</h1>
+    <p>{{ m().teamSubtitle }}</p>
   </header>
 
   @if (loading()) {
-    <app-loading-skeleton [rows]="4" label="Loading users" />
+    <app-loading-skeleton variant="users" [label]="m().loadingUsers" />
   } @else {
-    <mat-card>
-      <mat-nav-list>
-        @for (user of assignees(); track user.id) {
-          <mat-list-item>
-            <span matListItemAvatar class="users__avatar" aria-hidden="true">{{ user.avatar }}</span>
-            <span matListItemTitle>{{ user.name }}</span>
-            <span matListItemLine>{{ user.email }} · {{ taskCount(user.id) }} tasks</span>
-            <mat-icon matListItemMeta aria-hidden="true">person</mat-icon>
-          </mat-list-item>
-        }
-      </mat-nav-list>
-    </mat-card>
+    <ul class="users__list enter">
+      @for (user of assignees(); track user.id; let i = $index) {
+        <li class="users__item enter-item" [style.--enter-i]="i">
+          <span class="users__avatar" aria-hidden="true">{{ initials(user.name) }}</span>
+          <div class="users__meta">
+            <p class="users__name">{{ user.name }}</p>
+            <p class="users__detail">{{ user.email }} · {{ taskCountLabel(user.id) }}</p>
+          </div>
+        </li>
+      }
+    </ul>
   }
 </section>

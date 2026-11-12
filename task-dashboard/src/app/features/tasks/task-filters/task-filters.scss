@@ -1,22 +1,158 @@
 .filters {
-  display: grid;
-  grid-template-columns: 2fr repeat(3, 1fr) auto;
-  gap: 0.75rem;
-  align-items: start;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-@media (max-width: 960px) {
+.filters__tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  border: 0;
+  background: transparent;
+  color: var(--tm-text-muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+
+  &:hover {
+    background: #e5e7eb;
+    color: var(--tm-text);
+  }
+
+  &--active {
+    background: var(--tm-primary-soft);
+    color: var(--tm-primary);
+  }
+}
+
+.filters__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  select {
+    appearance: none;
+    border: 1px solid var(--tm-border);
+    background: var(--tm-surface);
+    border-radius: var(--tm-radius-sm);
+    height: 40px;
+    padding-block: 0;
+    padding-inline: 0.85rem 2rem;
+    color: var(--tm-text);
+    font-weight: 500;
+    min-width: 120px;
+    cursor: pointer;
+  }
+
+  &--placeholder select {
+    color: var(--tm-text-muted);
+  }
+
+  // Wrapper keeps logical positioning; mat-icon itself forces direction:ltr.
+  &__chevron {
+    position: absolute;
+    inset-inline-end: 0.4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--tm-text-muted);
+    display: grid;
+    place-items: center;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 40px;
+  padding: 0 0.95rem;
+  border: 0;
+  border-radius: var(--tm-radius-sm);
+  background: var(--tm-primary);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--tm-primary-hover);
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 700px) {
   .filters {
-    grid-template-columns: 1fr 1fr;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .filters__search {
-    grid-column: 1 / -1;
+  .filters__tabs {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.15rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    flex-shrink: 0;
+  }
+
+  .filters__actions {
+    width: 100%;
+  }
+
+  .select {
+    flex: 1 1 calc(50% - 0.35rem);
+
+    select {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  .btn-primary {
+    flex: 1 1 100%;
+    justify-content: center;
   }
 }
 
-@media (max-width: 600px) {
-  .filters {
-    grid-template-columns: 1fr;
-  }
-}

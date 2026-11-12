@@ -1,0 +1,38 @@
+<section class="analytics">
+  <header class="analytics__header">
+    <div>
+      <h1>{{ m().analyticsTitle }}</h1>
+      <p>{{ m().analyticsSubtitle }}</p>
+    </div>
+    <button class="btn btn--refresh" type="button" (click)="refresh()">
+      <mat-icon aria-hidden="true">refresh</mat-icon>
+      <span>{{ m().refresh }}</span>
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="analytics__error" role="alert">
+      <p>{{ m().loadAnalyticsError }}</p>
+      <button class="btn btn--ghost" type="button" (click)="refresh()">{{ m().retry }}</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <app-loading-skeleton variant="analytics" [label]="m().loadingAnalytics" />
+  } @else {
+    <div class="analytics__grid enter">
+      <article class="panel enter-item" style="--enter-i: 0">
+        <h2>{{ m().priorityDistribution }}</h2>
+        <app-priority-chart [tasks]="tasks()" />
+      </article>
+      <article class="panel enter-item" style="--enter-i: 1">
+        <h2>{{ m().statusDistribution }}</h2>
+        <app-status-chart [tasks]="tasks()" />
+      </article>
+      <article class="panel panel--activity enter-item" style="--enter-i: 2">
+        <h2>{{ m().recentActivity }}</h2>
+        <app-activity-feed [items]="activity()" />
+      </article>
+    </div>
+  }
+</section>
