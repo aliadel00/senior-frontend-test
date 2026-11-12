@@ -6,6 +6,7 @@ export const ar: Messages = {
   searchPlaceholder: 'ابحث عن المهام...',
   searchAria: 'بحث المهام',
   clearSearch: 'مسح البحث',
+  searchActiveHint: 'امسح البحث لعرض كل المهام',
   notifications: 'الإشعارات',
   notificationsEmpty: 'أنت على اطلاع — لا يوجد نشاط بعد.',
   notificationsEmptyUnread: 'لا توجد إشعارات غير مقروءة.',

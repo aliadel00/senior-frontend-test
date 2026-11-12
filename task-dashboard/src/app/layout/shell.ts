@@ -303,6 +303,10 @@ export class Shell {
     event.preventDefault();
     event.stopPropagation();
     this.notifications.markRead(item.id);
+    // Deleted tasks no longer exist — mark read only, don't navigate.
+    if (item.action === 'deleted') {
+      return;
+    }
     // Reset status/priority/assignee so the matched task is actually visible.
     this.store.resetFilters();
     this.store.setSearch(item.taskTitle);
