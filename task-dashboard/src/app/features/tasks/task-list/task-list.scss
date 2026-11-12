@@ -31,7 +31,7 @@
   height: 22px;
   padding: 0 0.4rem;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: var(--tm-chip);
   color: var(--tm-text-muted);
   display: inline-grid;
   place-items: center;
@@ -63,7 +63,7 @@
   font-size: 0.85rem;
   border: 1px dashed var(--tm-border);
   border-radius: var(--tm-radius);
-  background: rgba(255, 255, 255, 0.6);
+  background: color-mix(in srgb, var(--tm-surface) 70%, transparent);
 }
 
 .cdk-drop-list-dragging .board__item:not(.cdk-drag-placeholder) {

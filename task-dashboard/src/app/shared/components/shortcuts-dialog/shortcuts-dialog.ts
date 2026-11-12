@@ -13,6 +13,7 @@ export interface ShortcutRow {
     | 'shortcutAnalytics'
     | 'shortcutTeam'
     | 'shortcutLanguage'
+    | 'shortcutTheme'
     | 'shortcutMenu'
     | 'shortcutHelp'
     | 'shortcutClose';
@@ -39,6 +40,7 @@ export class ShortcutsDialog {
     { keys: ['2'], labelKey: 'shortcutAnalytics' },
     { keys: ['3'], labelKey: 'shortcutTeam' },
     { keys: ['L'], labelKey: 'shortcutLanguage' },
+    { keys: ['T'], labelKey: 'shortcutTheme' },
     { keys: ['M'], labelKey: 'shortcutMenu' },
     { keys: ['?'], labelKey: 'shortcutHelp' },
     { keys: ['Esc'], labelKey: 'shortcutClose' },

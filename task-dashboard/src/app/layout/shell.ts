@@ -23,6 +23,7 @@ import {
 } from '../core/services/notification.service';
 import { I18nService } from '../core/i18n/i18n.service';
 import { Locale } from '../core/i18n/types';
+import { Theme, ThemeService } from '../core/services/theme.service';
 import { ShortcutsDialog } from '../shared/components/shortcuts-dialog/shortcuts-dialog';
 
 interface NavLink {
@@ -49,6 +50,7 @@ export class Shell {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   readonly i18n = inject(I18nService);
+  readonly theme = inject(ThemeService);
   readonly notifications = inject(NotificationService);
 
   readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
@@ -57,8 +59,11 @@ export class Shell {
   readonly search = this.store.filters;
   readonly menuOpen = signal(false);
   readonly notificationsOpen = signal(false);
+  /** Brief press feedback on the theme control. */
+  readonly themePulse = signal(false);
   /** Drives nav active state under OnPush (path + fragment). */
   private readonly navUrl = signal(this.router.url);
+  private themePulseTimer: number | null = null;
   /** Whole-app EN↔AR transition: idle → out → in → idle. */
   readonly localePhase = signal<'idle' | 'out' | 'in'>('idle');
   readonly m = computed(() => this.i18n.messages());
@@ -103,6 +108,9 @@ export class Shell {
     this.destroyRef.onDestroy(() => {
       drawerMq.removeEventListener('change', onViewportChange);
       this.clearLocaleTimers();
+      if (this.themePulseTimer !== null) {
+        window.clearTimeout(this.themePulseTimer);
+      }
     });
   }
 
@@ -186,6 +194,11 @@ export class Shell {
       case 'L':
         event.preventDefault();
         this.toggleLanguage();
+        break;
+      case 't':
+      case 'T':
+        event.preventDefault();
+        this.toggleTheme();
         break;
       case 'm':
       case 'M':
@@ -364,6 +377,33 @@ export class Shell {
 
   toggleLanguage(): void {
     this.setLanguage(this.i18n.locale() === 'en' ? 'ar' : 'en');
+  }
+
+  toggleTheme(event?: Event): void {
+    this.pulseThemeControl();
+    const mouse = event instanceof MouseEvent ? event : undefined;
+    void this.theme.toggleAnimated(mouse);
+  }
+
+  setTheme(next: Theme, event?: Event): void {
+    if (this.theme.theme() === next) {
+      return;
+    }
+    this.pulseThemeControl();
+    const mouse = event instanceof MouseEvent ? event : undefined;
+    void this.theme.setThemeAnimated(next, mouse);
+  }
+
+  private pulseThemeControl(): void {
+    this.themePulse.set(false);
+    queueMicrotask(() => this.themePulse.set(true));
+    if (this.themePulseTimer !== null) {
+      window.clearTimeout(this.themePulseTimer);
+    }
+    this.themePulseTimer = window.setTimeout(() => {
+      this.themePulse.set(false);
+      this.themePulseTimer = null;
+    }, 480);
   }
 
   setLanguage(locale: Locale): void {

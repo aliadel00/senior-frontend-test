@@ -18,12 +18,38 @@
   --tm-warning-soft: #fffbeb;
   --tm-success: #15803d;
   --tm-success-soft: #f0fdf4;
+  --tm-chip: #e5e7eb;
+  --tm-skeleton-a: #e8ebef;
+  --tm-skeleton-b: #f4f6f8;
   --tm-sidebar-width: 220px;
   --tm-topbar-height: 64px;
   --tm-radius: 12px;
   --tm-radius-sm: 8px;
   --tm-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
   --tm-font: 'Inter', 'Noto Sans Arabic', system-ui, -apple-system, sans-serif;
+}
+
+html[data-theme='dark'] {
+  --tm-bg: #0f1419;
+  --tm-surface: #1a222c;
+  --tm-border: #2a3544;
+  --tm-border-strong: #3d4b5c;
+  --tm-text: #e8eef5;
+  --tm-text-muted: #b0bccb;
+  --tm-text-soft: #8b9aab;
+  --tm-primary: #60a5fa;
+  --tm-primary-hover: #93c5fd;
+  --tm-primary-soft: #1e3a5f;
+  --tm-danger: #f87171;
+  --tm-danger-soft: #3f1d1d;
+  --tm-warning: #fbbf24;
+  --tm-warning-soft: #3f2f0f;
+  --tm-success: #4ade80;
+  --tm-success-soft: #143528;
+  --tm-chip: #243040;
+  --tm-skeleton-a: #243040;
+  --tm-skeleton-b: #2c3a4d;
+  --tm-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 html[lang='ar'] {
@@ -48,7 +74,7 @@ html {
 }
 
 body {
-  color-scheme: light;
+  color-scheme: light dark;
   margin: 0;
   height: 100%;
   background: var(--tm-bg);
@@ -57,6 +83,57 @@ body {
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
+}
+
+/* Soft whole-app theme fade (desktop + mobile). */
+html.tm-theme-fading .shell {
+  animation: tm-theme-app-fade 0.28s ease;
+}
+
+html.tm-theme-fading body,
+html.tm-theme-fading .shell,
+html.tm-theme-fading .topbar,
+html.tm-theme-fading .sidebar,
+html.tm-theme-fading .shell__content,
+html.tm-theme-fading .mobile-search {
+  transition:
+    background-color 0.28s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+@keyframes tm-theme-app-fade {
+  0% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+html[data-theme='light'] body {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] body {
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.tm-theme-fading .shell {
+    animation: none;
+  }
+
+  body {
+    transition: none;
+  }
 }
 
 * {

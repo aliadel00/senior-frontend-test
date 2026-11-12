@@ -50,7 +50,7 @@
 }
 
 .stat-card[data-tone='warning'] .stat-card__icon {
-  background: #eff6ff;
+  background: var(--tm-primary-soft);
   color: var(--tm-primary);
 }
 
