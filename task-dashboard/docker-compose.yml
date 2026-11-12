@@ -5,7 +5,7 @@ services:
     volumes:
       - ./:/app
       - ../data-fetching:/data-fetching
-    command: sh -c "node mock-api/server.mjs"
+    command: sh -c "node mock-api/build-db.mjs && node mock-api/server.mjs"
     ports:
       - '3000:3000'
     environment:
@@ -13,7 +13,11 @@ services:
       DATA_DIR: /data-fetching
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: docker
     ports:
       - '8080:80'
     depends_on:

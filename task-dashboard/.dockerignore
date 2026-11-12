@@ -1,0 +1,12 @@
+node_modules
+dist
+.angular
+coverage
+.lighthouseci
+test-results
+playwright-report
+.git
+*.md
+.husky
+.vscode
+.idea

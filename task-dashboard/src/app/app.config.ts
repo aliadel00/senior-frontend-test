@@ -6,12 +6,15 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { routes } from './app.routes';
 import { cacheInterceptor } from './core/interceptors/cache.interceptor';
 import { retryInterceptor } from './core/interceptors/retry.interceptor';
+import { staticMockInterceptor } from './core/interceptors/static-mock.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([cacheInterceptor, retryInterceptor])),
+    provideHttpClient(
+      withInterceptors([staticMockInterceptor, cacheInterceptor, retryInterceptor]),
+    ),
     provideAnimationsAsync(),
     provideNativeDateAdapter(),
   ],
