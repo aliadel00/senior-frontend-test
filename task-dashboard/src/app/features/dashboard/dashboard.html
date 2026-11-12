@@ -30,7 +30,11 @@
       />
     </div>
 
-    <section class="dashboard__board" [attr.aria-label]="m().taskBoard">
+    <section
+      id="task-board"
+      class="dashboard__board"
+      [attr.aria-label]="m().taskBoard"
+    >
       <app-task-list
         [tasks]="filteredTasks()"
         (edit)="openEdit($event)"

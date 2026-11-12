@@ -22,6 +22,7 @@ import {
   NotificationView,
 } from '../core/services/notification.service';
 import { I18nService } from '../core/i18n/i18n.service';
+import { Locale } from '../core/i18n/types';
 import { ShortcutsDialog } from '../shared/components/shortcuts-dialog/shortcuts-dialog';
 
 interface NavLink {
@@ -49,6 +50,7 @@ export class Shell {
   readonly notifications = inject(NotificationService);
 
   readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+  readonly mobileSearchInput = viewChild<ElementRef<HTMLInputElement>>('mobileSearchInput');
 
   readonly search = this.store.filters;
   readonly menuOpen = signal(false);
@@ -58,6 +60,8 @@ export class Shell {
   readonly m = computed(() => this.i18n.messages());
   private localeSwapTimers: number[] = [];
   private shortcutsOpen = false;
+  /** Scroll to the board once per non-empty search session. */
+  private scrolledForSearch = false;
 
   readonly links: NavLink[] = [
     { path: '/dashboard', key: 'dashboard', icon: 'dashboard', shortcut: '1' },
@@ -79,7 +83,17 @@ export class Shell {
         this.notificationsOpen.set(false);
       });
 
-    this.destroyRef.onDestroy(() => this.clearLocaleTimers());
+    // Laptop→tablet: sidebar becomes a hamburger drawer. Keep it open so it
+    // doesn't snap shut; desktop restores the persistent rail and clears state.
+    const drawerMq = window.matchMedia('(max-width: 960px)');
+    const onViewportChange = (): void => {
+      this.menuOpen.set(drawerMq.matches);
+    };
+    drawerMq.addEventListener('change', onViewportChange);
+    this.destroyRef.onDestroy(() => {
+      drawerMq.removeEventListener('change', onViewportChange);
+      this.clearLocaleTimers();
+    });
   }
 
   private clearLocaleTimers(): void {
@@ -177,12 +191,38 @@ export class Shell {
     this.store.setSearch(value);
     if (!value.trim()) {
       this.store.selectTask(null);
+      this.scrolledForSearch = false;
+      return;
+    }
+
+    const onDashboard = this.router.url.split('?')[0] === '/dashboard';
+    if (!this.scrolledForSearch || !onDashboard) {
+      this.scrolledForSearch = true;
+      void this.revealTasks();
     }
   }
 
   clearSearch(): void {
     this.store.setSearch('');
     this.store.selectTask(null);
+    this.scrolledForSearch = false;
+  }
+
+  private async revealTasks(): Promise<void> {
+    const onDashboard = this.router.url.split('?')[0] === '/dashboard';
+    if (!onDashboard) {
+      await this.router.navigateByUrl('/dashboard');
+    }
+
+    window.setTimeout(
+      () => {
+        document.getElementById('task-board')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      },
+      onDashboard ? 0 : 80,
+    );
   }
 
   onNewTask(): void {
@@ -210,8 +250,12 @@ export class Shell {
   }
 
   private focusSearch(): void {
-    this.searchInput()?.nativeElement.focus();
-    this.searchInput()?.nativeElement.select();
+    const isMobile = window.matchMedia('(max-width: 960px)').matches;
+    const input = (
+      isMobile ? this.mobileSearchInput() : this.searchInput()
+    )?.nativeElement;
+    input?.focus();
+    input?.select();
   }
 
   private go(path: string): void {
@@ -264,14 +308,20 @@ export class Shell {
     this.store.setSearch(item.taskTitle);
     this.store.selectTask(item.taskId);
     this.notificationsOpen.set(false);
-    void this.router.navigateByUrl('/dashboard');
+    this.scrolledForSearch = true;
+    void this.revealTasks();
   }
 
-  setLanguage(locale: 'en' | 'ar'): void {
-    if (this.i18n.locale() === locale) {
+  toggleLanguage(): void {
+    this.setLanguage(this.i18n.locale() === 'en' ? 'ar' : 'en');
+  }
+
+  setLanguage(locale: Locale): void {
+    if (this.i18n.locale() === locale || this.localePhase() !== 'idle') {
       return;
     }
     this.clearLocaleTimers();
+    // Phase 1: fade the whole app out, then flip locale and fade back in.
     this.localePhase.set('out');
     this.localeSwapTimers.push(
       window.setTimeout(() => {
@@ -285,10 +335,6 @@ export class Shell {
         );
       }, 160),
     );
-  }
-
-  toggleLanguage(): void {
-    this.setLanguage(this.i18n.locale() === 'en' ? 'ar' : 'en');
   }
 
   isActive(link: NavLink): boolean {
