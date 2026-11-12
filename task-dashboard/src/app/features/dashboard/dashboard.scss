@@ -14,6 +14,18 @@
   min-width: 0;
 }
 
+.dashboard__board {
+  scroll-margin-top: calc(var(--tm-topbar-height) + 0.75rem);
+}
+
+@media (max-width: 960px) {
+  .dashboard__board {
+    scroll-margin-top: calc(
+      var(--tm-topbar-height) + var(--tm-mobile-search-height, 3.5rem) + 0.75rem
+    );
+  }
+}
+
 .dashboard__error {
   display: flex;
   justify-content: space-between;

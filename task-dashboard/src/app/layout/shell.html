@@ -199,6 +199,31 @@
     </div>
   </header>
 
+  <div class="mobile-search" [attr.title]="m().shortcutSearch + ' (/)'">
+    <div class="search search--mobile">
+      <mat-icon aria-hidden="true">search</mat-icon>
+      <input
+        #mobileSearchInput
+        type="search"
+        [placeholder]="m().searchPlaceholder"
+        [ngModel]="search().search"
+        (ngModelChange)="onSearch($event)"
+        [attr.aria-label]="m().searchAria"
+        [attr.aria-keyshortcuts]="'/'"
+      />
+      @if (search().search.trim()) {
+        <button
+          class="search__clear"
+          type="button"
+          [attr.aria-label]="m().clearSearch"
+          (click)="clearSearch()"
+        >
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      }
+    </div>
+  </div>
+
   <div class="shell__body">
     <div
       class="sidebar-backdrop"
@@ -214,41 +239,37 @@
       [attr.aria-label]="m().primaryNav"
     >
       <div class="sidebar__mobile-tools">
-        <div class="search search--sidebar" [attr.title]="m().shortcutSearch + ' (/)'">
-          <mat-icon aria-hidden="true">search</mat-icon>
-          <input
-            #mobileSearchInput
-            type="search"
-            [placeholder]="m().searchPlaceholder"
-            [ngModel]="search().search"
-            (ngModelChange)="onSearch($event)"
-            [attr.aria-label]="m().searchAria"
-            [attr.aria-keyshortcuts]="'/'"
-          />
-          @if (search().search.trim()) {
+        <div class="sidebar__lang" role="group" [attr.aria-label]="m().language">
+          <span class="sidebar__lang-label" id="sidebar-lang-label">{{ m().language }}</span>
+          <div
+            class="lang-switch"
+            role="radiogroup"
+            aria-labelledby="sidebar-lang-label"
+            [attr.aria-keyshortcuts]="'L'"
+            [attr.title]="m().shortcutLanguage + ' (L)'"
+          >
             <button
-              class="search__clear"
+              class="lang-switch__option"
               type="button"
-              [attr.aria-label]="m().clearSearch"
-              (click)="clearSearch()"
+              role="radio"
+              [attr.aria-checked]="i18n.locale() === 'en'"
+              [class.lang-switch__option--active]="i18n.locale() === 'en'"
+              (click)="setLanguage('en')"
             >
-              <mat-icon aria-hidden="true">close</mat-icon>
+              {{ m().localeEn }}
             </button>
-          }
+            <button
+              class="lang-switch__option"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="i18n.locale() === 'ar'"
+              [class.lang-switch__option--active]="i18n.locale() === 'ar'"
+              (click)="setLanguage('ar')"
+            >
+              {{ m().localeAr }}
+            </button>
+          </div>
         </div>
-
-        <button
-          class="sidebar__lang"
-          type="button"
-          [attr.aria-keyshortcuts]="'L'"
-          [attr.title]="m().shortcutLanguage + ' (L)'"
-          (click)="toggleLanguage()"
-        >
-          <span class="lang-chip" [attr.data-locale]="i18n.locale()">
-            {{ i18n.locale() === 'en' ? m().localeAr : m().localeEn }}
-          </span>
-          <span>{{ m().language }}</span>
-        </button>
       </div>
 
       <nav class="sidebar__nav">
