@@ -50,22 +50,94 @@ describe('TaskService', () => {
     });
   });
 
-  it('computes live statistics', () => {
+  it('computes live statistics deltas from task dates', () => {
+    const today = new Date();
+    today.setHours(12, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const lastWeek = new Date(today);
+    lastWeek.setDate(lastWeek.getDate() - 3);
+    const older = new Date(today);
+    older.setDate(older.getDate() - 20);
+
+    const iso = (d: Date) => d.toISOString();
+    const day = (d: Date) => d.toISOString().slice(0, 10);
+
     const stats = service.computeLiveStatistics([
       {
         id: '1',
-        title: 'A',
+        title: 'Overdue since yesterday',
         description: 'B',
         status: 'todo',
         priority: 'high',
-        dueDate: '2000-01-01',
+        dueDate: day(yesterday),
         assignee: assignees[0],
         tags: [],
-        createdAt: '',
-        updatedAt: '',
+        createdAt: iso(older),
+        updatedAt: iso(older),
+      },
+      {
+        id: '2',
+        title: 'Done today',
+        description: 'B',
+        status: 'done',
+        priority: 'medium',
+        dueDate: day(today),
+        completedAt: iso(today),
+        assignee: assignees[0],
+        tags: [],
+        createdAt: iso(lastWeek),
+        updatedAt: iso(today),
+      },
+      {
+        id: '3',
+        title: 'In progress today',
+        description: 'B',
+        status: 'in_progress',
+        priority: 'low',
+        dueDate: day(today),
+        assignee: assignees[0],
+        tags: [],
+        createdAt: iso(today),
+        updatedAt: iso(today),
+      },
+      {
+        id: '4',
+        title: 'Old done',
+        description: 'B',
+        status: 'done',
+        priority: 'low',
+        dueDate: day(older),
+        completedAt: iso(older),
+        assignee: assignees[0],
+        tags: [],
+        createdAt: iso(older),
+        updatedAt: iso(older),
       },
     ]);
-    expect(stats.find((s) => s.id === 'live-overdue')?.value).toBe(1);
+
+    expect(stats.find((s) => s.id === 'live-total')).toMatchObject({
+      value: 4,
+      change: '+2',
+      changeLabel: 'this week',
+    });
+    expect(stats.find((s) => s.id === 'live-done')).toMatchObject({
+      value: 2,
+      change: '+1',
+      changeLabel: 'today',
+      changeType: 'positive',
+    });
+    expect(stats.find((s) => s.id === 'live-progress')).toMatchObject({
+      value: 1,
+      change: '+1',
+      changeLabel: 'today',
+    });
+    expect(stats.find((s) => s.id === 'live-overdue')).toMatchObject({
+      value: 1,
+      change: '+1',
+      changeLabel: 'today',
+      changeType: 'negative',
+    });
   });
 
   it('updates and deletes tasks', () => {
