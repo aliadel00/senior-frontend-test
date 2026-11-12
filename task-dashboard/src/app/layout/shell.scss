@@ -417,7 +417,8 @@
   top: calc(100% + 0.5rem);
   inset-inline-end: 0;
   z-index: 40;
-  width: min(380px, 92vw);
+  width: min(380px, calc(100vw - 1.5rem));
+  max-width: calc(100vw - 1.5rem);
   padding: 0.85rem 0.85rem 0.65rem;
   background: var(--tm-surface);
   border: 1px solid var(--tm-border);
