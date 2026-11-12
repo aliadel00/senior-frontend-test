@@ -77,7 +77,7 @@
         [attr.aria-keyshortcuts]="'T'"
         [attr.aria-label]="m().themeToggle"
         [attr.title]="m().shortcutTheme + ' (T)'"
-        (click)="toggleTheme($event)"
+        (click)="toggleTheme()"
       >
         <span class="theme-icon" aria-hidden="true">
           <mat-icon class="theme-icon__moon" fontIcon="dark_mode">dark_mode</mat-icon>
@@ -303,7 +303,7 @@
               role="radio"
               [attr.aria-checked]="theme.theme() === 'light'"
               [class.theme-switch__option--active]="theme.theme() === 'light'"
-              (click)="setTheme('light', $event)"
+              (click)="setTheme('light')"
             >
               <mat-icon aria-hidden="true">light_mode</mat-icon>
               <span>{{ m().themeLight }}</span>
@@ -314,7 +314,7 @@
               role="radio"
               [attr.aria-checked]="theme.theme() === 'dark'"
               [class.theme-switch__option--active]="theme.theme() === 'dark'"
-              (click)="setTheme('dark', $event)"
+              (click)="setTheme('dark')"
             >
               <mat-icon aria-hidden="true">dark_mode</mat-icon>
               <span>{{ m().themeDark }}</span>

@@ -71,6 +71,10 @@ export class Shell {
   private shortcutsOpen = false;
   /** Scroll to the board once per non-empty search session. */
   private scrolledForSearch = false;
+  /** Bumped so late board-find retries stop after a newer nav/scroll request. */
+  private scrollSession = 0;
+  /** Bumped on each go()/goDashboard() so a superseded then() does not scroll the wrong page. */
+  private navEpoch = 0;
 
   readonly links: NavLink[] = [
     { path: '/dashboard', key: 'dashboard', icon: 'dashboard', shortcut: '1' },
@@ -93,9 +97,13 @@ export class Shell {
         takeUntilDestroyed(),
       )
       .subscribe((event) => {
+        // Single source of truth for the active nav highlight — no optimistic rewrites.
         this.navUrl.set(event.urlAfterRedirects);
         this.menuOpen.set(false);
         this.notificationsOpen.set(false);
+        if (!this.pathOf(event.urlAfterRedirects).startsWith('/dashboard')) {
+          this.scrollSession++;
+        }
       });
 
     // Laptop→tablet: sidebar becomes a hamburger drawer. Keep it open so it
@@ -180,7 +188,7 @@ export class Shell {
         break;
       case '1':
         event.preventDefault();
-        this.go('/dashboard');
+        this.goDashboard();
         break;
       case '2':
         event.preventDefault();
@@ -231,8 +239,9 @@ export class Shell {
     this.scrolledForSearch = false;
   }
 
-  private currentPath(): string {
-    const tree = this.router.parseUrl(this.navUrl());
+  /** Path only (ignore query/hash). Prefer for route checks. */
+  private pathOf(url: string): string {
+    const tree = this.router.parseUrl(url);
     const primary = tree.root.children['primary'];
     if (!primary?.segments.length) {
       return '/';
@@ -240,26 +249,94 @@ export class Shell {
     return `/${primary.segments.map((s) => s.path).join('/')}`;
   }
 
+  private currentPath(): string {
+    return this.pathOf(this.navUrl());
+  }
+
   private currentFragment(): string | null {
     return this.router.parseUrl(this.navUrl()).fragment;
   }
 
+  /** Real router location — not the optimistic navUrl highlight. */
+  private routerPath(): string {
+    return this.pathOf(this.router.url);
+  }
+
+  private routerFragment(): string | null {
+    return this.router.parseUrl(this.router.url).fragment;
+  }
+
   private async revealTasks(): Promise<void> {
-    const onDashboard = this.currentPath() === '/dashboard';
-    const onBoard = this.currentFragment() === 'task-board';
-    if (!onDashboard || !onBoard) {
-      await this.router.navigate(['/dashboard'], { fragment: 'task-board' });
+    const epoch = ++this.navEpoch;
+    const session = this.scrollSession;
+    const onDashboard = this.routerPath() === '/dashboard';
+    const onBoard = this.routerFragment() === 'task-board';
+
+    if (!onDashboard) {
+      const ok = await this.router.navigateByUrl('/dashboard');
+      if (!ok || epoch !== this.navEpoch || session !== this.scrollSession) {
+        return;
+      }
+      await this.setDashboardFragment(true);
+    } else if (!onBoard) {
+      await this.setDashboardFragment(true);
     }
 
-    window.setTimeout(
-      () => {
-        document.getElementById('task-board')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      },
-      onDashboard && onBoard ? 0 : 80,
-    );
+    if (epoch !== this.navEpoch) {
+      return;
+    }
+    this.scrollTaskBoardIntoView(0, this.scrollSession);
+  }
+
+  /** Sync `/dashboard` ↔ `/dashboard#task-board` through the Router (keeps highlight in sync). */
+  private setDashboardFragment(onBoard: boolean): Promise<boolean> {
+    const tree = this.router.createUrlTree(['/dashboard'], {
+      // `undefined` clears the fragment; `null` would keep the current one.
+      fragment: onBoard ? 'task-board' : undefined,
+    });
+    return this.router.navigateByUrl(tree, { replaceUrl: true });
+  }
+
+  /** Native smooth scroll — survives Angular CD (rAF tweens were starved mid-nav and snapped). */
+  private smoothScrollTo(top: number): void {
+    this.scrollSession++;
+    if (Math.abs(window.scrollY - top) < 1) {
+      return;
+    }
+    const reduced =
+      typeof matchMedia === 'function' &&
+      matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+  }
+
+  /** Retry until the board mounts (lazy dashboard) then pin it under the sticky topbar. */
+  private scrollTaskBoardIntoView(attempt = 0, session = this.scrollSession): void {
+    if (session !== this.scrollSession) {
+      return;
+    }
+
+    const board = document.getElementById('task-board');
+    if (!board) {
+      if (attempt < 20) {
+        window.setTimeout(() => this.scrollTaskBoardIntoView(attempt + 1, session), 50);
+      }
+      return;
+    }
+
+    if (document.activeElement === board || document.activeElement?.id === 'main-content') {
+      (document.activeElement as HTMLElement).blur();
+    }
+
+    const topbar = document.querySelector('.topbar') as HTMLElement | null;
+    const mobileSearch = window.matchMedia('(max-width: 960px)').matches
+      ? (document.querySelector('.sidebar__mobile-tools') as HTMLElement | null)
+      : null;
+    const offset =
+      (topbar?.offsetHeight ?? 0) +
+      (mobileSearch?.offsetHeight ?? 0) +
+      12;
+    const y = board.getBoundingClientRect().top + window.scrollY - offset;
+    this.smoothScrollTo(Math.max(0, y));
   }
 
   onNewTask(): void {
@@ -296,31 +373,73 @@ export class Shell {
   }
 
   private go(path: string): void {
+    const epoch = ++this.navEpoch;
     this.menuOpen.set(false);
     this.notificationsOpen.set(false);
-    void this.router.navigateByUrl(path);
+    // Cancel in-flight dashboard smooth scroll without snapping (snap caused the stutter).
+    this.scrollSession++;
+    void this.router.navigateByUrl(path).then((ok) => {
+      if (epoch !== this.navEpoch || !ok) {
+        return;
+      }
+      window.scrollTo(0, 0);
+    });
+  }
+
+  /** Dashboard home: clear #task-board and smooth-scroll to top (mouse + shortcut 1). */
+  private goDashboard(): void {
+    const epoch = ++this.navEpoch;
+    this.menuOpen.set(false);
+    this.notificationsOpen.set(false);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    const onDashboard = this.routerPath() === '/dashboard';
+    const onBoard = this.routerFragment() === 'task-board';
+
+    if (onDashboard) {
+      // Clear hash without Router navigation (Router CD starved rAF tweens → stutter).
+      if (onBoard) {
+        const url = this.router.serializeUrl(this.router.createUrlTree(['/dashboard']));
+        history.replaceState(history.state, '', url);
+        this.navUrl.set(url);
+      }
+      this.smoothScrollTo(0);
+      return;
+    }
+
+    void this.router.navigateByUrl('/dashboard').then((ok) => {
+      if (epoch !== this.navEpoch || !ok) {
+        return;
+      }
+      window.scrollTo(0, 0);
+    });
   }
 
   onNavClick(link: NavLink, event: Event): void {
     if (!link.path || link.disabled) {
       return;
     }
-    // Keep routerLink for open-in-new-tab; handle exclusive section scroll ourselves.
+    // Allow open-in-new-tab / modified clicks to use routerLink as-is.
+    if (
+      event instanceof MouseEvent &&
+      (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)
+    ) {
+      return;
+    }
+    // One navigation path for mouse + shortcuts (avoids routerLink + handler double work).
+    event.preventDefault();
+    this.closeMenu();
     if (link.fragment) {
-      event.preventDefault();
-      this.closeMenu();
       void this.revealTasks();
       return;
     }
     if (link.key === 'dashboard') {
-      event.preventDefault();
-      this.closeMenu();
-      void this.router.navigate(['/dashboard']).then(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
+      this.goDashboard();
       return;
     }
-    this.closeMenu();
+    this.go(link.path);
   }
 
   private isTypingTarget(target: EventTarget | null): boolean {
@@ -379,19 +498,17 @@ export class Shell {
     this.setLanguage(this.i18n.locale() === 'en' ? 'ar' : 'en');
   }
 
-  toggleTheme(event?: Event): void {
+  toggleTheme(): void {
     this.pulseThemeControl();
-    const mouse = event instanceof MouseEvent ? event : undefined;
-    void this.theme.toggleAnimated(mouse);
+    void this.theme.toggleAnimated();
   }
 
-  setTheme(next: Theme, event?: Event): void {
+  setTheme(next: Theme): void {
     if (this.theme.theme() === next) {
       return;
     }
     this.pulseThemeControl();
-    const mouse = event instanceof MouseEvent ? event : undefined;
-    void this.theme.setThemeAnimated(next, mouse);
+    void this.theme.setThemeAnimated(next);
   }
 
   private pulseThemeControl(): void {
